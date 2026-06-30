@@ -1930,8 +1930,7 @@ for(const t of ["gesturestart","gesturechange","gestureend"]){
 document.addEventListener("touchstart", _blockPinch, {passive:false, capture:true});
 document.addEventListener("touchmove",  _blockPinch, {passive:false, capture:true});
 
-/* best-effort portrait lock (works in installed/Android contexts; harmless no-op in iOS Safari,
-   where the CSS rotate-gate handles it instead) */
+/* best-effort portrait lock (works in installed/Android contexts; harmless no-op in iOS Safari, where the CSS rotate-gate handles it instead) */
 try{ if(screen.orientation && screen.orientation.lock) screen.orientation.lock("portrait").catch(()=>{}); }catch(e){}
 
 /* one-time "Add to Home Screen" hint — iOS Safari only, hidden once installed/dismissed */
