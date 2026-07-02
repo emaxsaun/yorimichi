@@ -716,14 +716,14 @@ body.rpg-in-store .whud{display:flex;}
   padding-bottom:calc(18px + env(safe-area-inset-bottom,0px));pointer-events:none;
   -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
 body.rpg-active .joywrap{display:block;}
-.joybase{position:absolute;left:22px;bottom:20px;width:104px;height:104px;border-radius:50%;
+.joybase{position:absolute;left:30px;bottom:calc(56px + env(safe-area-inset-bottom,0px));width:128px;height:128px;border-radius:50%;
   background:rgba(20,24,43,.28);border:2px solid rgba(255,255,255,.55);pointer-events:auto;touch-action:none;
   -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;}
-.joyknob{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;
+.joyknob{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;
   background:rgba(255,255,255,.85);border:2px solid rgba(20,24,43,.35);box-shadow:0 3px 8px rgba(0,0,0,.25);
   transition:transform .06s linear;pointer-events:none;
   -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
-.actbtn{position:absolute;right:26px;bottom:34px;width:66px;height:66px;border-radius:50%;
+.actbtn{position:absolute;right:30px;bottom:calc(78px + env(safe-area-inset-bottom,0px));width:74px;height:74px;border-radius:50%;
   background:rgba(14,158,110,.88);color:#fff;font-weight:800;font-size:14px;letter-spacing:.02em;
   border:2px solid rgba(255,255,255,.7);box-shadow:0 6px 16px -6px rgba(0,0,0,.5);
   display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.2;
@@ -750,7 +750,7 @@ body.rpg-active .joywrap{display:block;}
   color:var(--px-light);padding:1px 6px;margin:0 2px;font-size:9px;}
 
 /* field prompt bubble ("press A") */
-.fieldprompt{position:fixed;left:50%;bottom:calc(122px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+.fieldprompt{position:fixed;left:50%;bottom:calc(172px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
   z-index:4;background:rgba(20,24,43,.82);color:#fff;font-size:12.5px;font-weight:700;
   padding:8px 14px;border-radius:999px;display:none;pointer-events:none;white-space:nowrap;}
 .fieldprompt.on{display:block;animation:fade .18s ease both;}
@@ -2197,18 +2197,25 @@ function resizeStage(){
   if(!W.map) return;
   const inStore = document.body.classList.contains("rpg-in-store");
   const huH = inStore ? (whud.offsetHeight || 54) : 0;
-  stage.width = W.map.viewW*TILE;
-  stage.height = W.map.viewH*TILE;
   const availW = window.innerWidth;
   const availH = Math.max(80, window.innerHeight - huH);
-  const fitW = availW/stage.width, fitH = availH/stage.height;
-  // portrait phone screens: fill (cover) so the world fills the tall screen.
-  // wide / desktop screens: fit (contain) so you can see the whole scene, never over-zoomed.
+  const mapWpx = W.map.rows[0].length*TILE, mapHpx = W.map.rows.length*TILE;
   const portraitish = availW <= availH * 1.15;   // roughly taller-than-wide
-  let scale = portraitish ? Math.max(fitW, fitH) : Math.min(fitW, fitH);
-  // hard cap so a big monitor doesn't blow the tiles up to enormous size
   const MAX_SCALE = 6;
-  scale = Math.min(scale, MAX_SCALE);
+  let scale;
+  if(portraitish){
+    // phones: fill the height using the design window, then size the canvas so it
+    // matches the SCREEN exactly — nothing gets cropped, so the store walls are
+    // actually visible when you walk up to them.
+    scale = Math.min(availH/(W.map.viewH*TILE), MAX_SCALE);
+    stage.height = Math.min(W.map.viewH*TILE, mapHpx);
+    stage.width  = Math.min(Math.round(availW/scale), mapWpx);
+  } else {
+    // desktop / wide: show the whole design window, letterboxed, capped zoom
+    stage.width  = Math.min(W.map.viewW*TILE, mapWpx);
+    stage.height = Math.min(W.map.viewH*TILE, mapHpx);
+    scale = Math.min(availW/stage.width, availH/stage.height, MAX_SCALE);
+  }
   if(!isFinite(scale) || scale<=0) scale = 1;
   const cssW = stage.width*scale, cssH = stage.height*scale;
   stage.style.width = cssW+"px";
@@ -2312,7 +2319,8 @@ function updateFacing(){
 function updateCamera(){
   const p=W.player, map=W.map;
   const pxCenter=(p.fx+0.5)*TILE, pyCenter=(p.fy+0.5)*TILE;
-  const viewWpx=map.viewW*TILE, viewHpx=map.viewH*TILE;
+  // clamp against what the canvas ACTUALLY shows (it's sized to the screen on phones)
+  const viewWpx=stage.width, viewHpx=stage.height;
   const mapWpx=map.rows[0].length*TILE, mapHpx=map.rows.length*TILE;
   W.cam.x = clamp(pxCenter-viewWpx/2, 0, Math.max(0,mapWpx-viewWpx));
   W.cam.y = clamp(pyCenter-viewHpx/2, 0, Math.max(0,mapHpx-viewHpx));
@@ -2585,7 +2593,7 @@ function updateBalTop(){ const bt=$("#balTop"); if(bt) bt.textContent=yen(sessio
 
 /* ---------------------------------------------------------- pixel train ride */
 function runTrainRide(done){
-  document.body.classList.remove("rpg-in-store","in-store");
+  document.body.classList.remove("rpg-active","rpg-in-store","in-store"); // rpg-active off = joystick hidden during the ride
   hideFieldPrompt(); actBtn.classList.add("hidden");
   whud.innerHTML="";
   try{ Sound.depart && Sound.depart(); }catch(e){}
@@ -2671,7 +2679,7 @@ function resizeStageFixed(vw,vh){
 }
 
 /* ---------------------------------------------------------- virtual joystick + action button */
-const JOY_RADIUS=42, JOY_DEAD=14, JOY_START=16;
+const JOY_RADIUS=52, JOY_DEAD=16, JOY_START=18;
 let joyPointerId=null, joyOrigin={x:0,y:0}, joyEngaged=false;
 function joyDirFromDelta(dx,dy){
   const dist=Math.hypot(dx,dy);
@@ -3467,7 +3475,8 @@ function checkAchievements(total){
 }
 
 /* =========================================================== GLOBAL CONTROLS */
-/* delegated so the same controls work whether they live in the float overlay (most screens) or inside the store top bar */
+/* delegated so the same controls work whether they live in the float overlay
+   (most screens) or inside the store top bar */
 document.addEventListener("click", e=>{
   const s=e.target.closest(".js-sound");
   if(s){
@@ -3480,7 +3489,8 @@ document.addEventListener("click", e=>{
   if(p){ if(p.classList.contains("is-off")) return; Sound.resume();Sound.tick();showPassport(); }
 });
 
-/* Browsers block audio until the first user gesture — kick BGM in on the first tap/click/key anywhere, then remove the listener. */
+/* Browsers block audio until the first user gesture — kick BGM in on the
+   first tap/click/key anywhere, then remove the listener. */
 function firstGestureBGM(){
   Sound.resume();
   if(bgmAllowed) Sound.startAmbient(bgmKind);
@@ -3520,7 +3530,8 @@ for(const t of ["gesturestart","gesturechange","gestureend"]){
 document.addEventListener("touchstart", _blockPinch, {passive:false, capture:true});
 document.addEventListener("touchmove",  _blockPinch, {passive:false, capture:true});
 
-/* best-effort portrait lock (works in installed/Android contexts; harmless no-op in iOS Safari, where the CSS rotate-gate handles it instead) */
+/* best-effort portrait lock (works in installed/Android contexts; harmless no-op in iOS Safari,
+   where the CSS rotate-gate handles it instead) */
 try{ if(screen.orientation && screen.orientation.lock) screen.orientation.lock("portrait").catch(()=>{}); }catch(e){}
 
 /* one-time "Add to Home Screen" hint — iOS Safari only, hidden once installed/dismissed */
