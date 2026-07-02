@@ -2766,7 +2766,24 @@ function onStageTap(clientX, clientY){
   const path=bfsPath(p.tx,p.ty,tx,ty);
   if(path && path.length){ W.path=path; Sound.tick(); }
 }
-stage.addEventListener("pointerdown", e=>{ e.preventDefault(); onStageTap(e.clientX, e.clientY); });
+/* taps that land near the on-screen controls are meant for the controls, not the world —
+   a finger that misses the joystick circle by a few px shouldn't send the character walking */
+function tapNearControls(cx, cy){
+  if(joyPointerId !== null) return true;           // a joystick drag is in progress (multitouch)
+  const M = 36;                                    // forgiveness margin around each control
+  for(const el of [joyBase, actBtn]){
+    if(!el || el.classList.contains("hidden")) continue;
+    const r = el.getBoundingClientRect();
+    if(!r.width) continue;
+    if(cx >= r.left-M && cx <= r.right+M && cy >= r.top-M && cy <= r.bottom+M) return true;
+  }
+  return false;
+}
+stage.addEventListener("pointerdown", e=>{
+  e.preventDefault();
+  if(tapNearControls(e.clientX, e.clientY)) return;
+  onStageTap(e.clientX, e.clientY);
+});
 
 const KEYMAP = {ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right",w:"up",s:"down",a:"left",d:"right",W:"up",S:"down",A:"left",D:"right"};
 const INTERACT_KEYS = {" ":1,"Enter":1,"b":1,"B":1,"e":1,"E":1};
@@ -3411,7 +3428,8 @@ document.addEventListener("click", e=>{
   if(p){ if(p.classList.contains("is-off")) return; Sound.resume();Sound.tick();showPassport(); }
 });
 
-/* Browsers block audio until the first user gesture — kick BGM in on the first tap/click/key anywhere, then remove the listener. */
+/* Browsers block audio until the first user gesture — kick BGM in on the
+   first tap/click/key anywhere, then remove the listener. */
 function firstGestureBGM(){
   Sound.resume();
   if(bgmAllowed) Sound.startAmbient(bgmKind);
@@ -3451,7 +3469,8 @@ for(const t of ["gesturestart","gesturechange","gestureend"]){
 document.addEventListener("touchstart", _blockPinch, {passive:false, capture:true});
 document.addEventListener("touchmove",  _blockPinch, {passive:false, capture:true});
 
-/* best-effort portrait lock (works in installed/Android contexts; harmless no-op in iOS Safari, where the CSS rotate-gate handles it instead) */
+/* best-effort portrait lock (works in installed/Android contexts; harmless no-op in iOS Safari,
+   where the CSS rotate-gate handles it instead) */
 try{ if(screen.orientation && screen.orientation.lock) screen.orientation.lock("portrait").catch(()=>{}); }catch(e){}
 
 /* one-time "Add to Home Screen" hint — iOS Safari only, hidden once installed/dismissed */
