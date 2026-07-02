@@ -14,7 +14,7 @@
 <meta name="description" content="A quiet Japanese convenience-store visit you can take any time you miss it. Walk over, browse the shelves, tap your IC card, and eat something good." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Roboto+Mono:wght@400;500;700&family=Press+Start+2P&family=DotGothic16&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
    YORIMICHI — design tokens
@@ -51,7 +51,13 @@ body{
   background:#dfe6e4;
   -webkit-font-smoothing:antialiased;
   position:fixed;inset:0;overflow:hidden;overscroll-behavior:none;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;
 }
+#world,#stage,.whud,.joywrap,.fieldprompt,.actbtn{
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;
+}
+/* re-enable selection inside populated app screens (receipts etc.) */
+#app:not(:empty){-webkit-user-select:text;user-select:text;}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 16px;}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
 h1,h2,h3{font-family:"Zen Maru Gothic",sans-serif;margin:0;line-height:1.15;letter-spacing:.01em;}
@@ -111,12 +117,6 @@ body.tod-late{background:linear-gradient(180deg,#dbe3f0,#ccd4e2);}
 .splash-cta{margin-top:10px;font-weight:800;color:#fff;background:var(--brand);border-radius:999px;
   padding:15px 30px;font-size:16px;box-shadow:0 12px 24px -10px var(--brand-deep);animation:breathe 2s ease-in-out infinite;}
 .splash-hint{font-size:11.5px;color:var(--ink-soft);opacity:.7;margin-top:2px;}
-.mode-switch{display:inline-block;margin-top:18px;padding:10px 18px;font-size:13px;font-weight:700;
-  color:var(--brand-deep);background:#fff;border:1px solid var(--line);border-radius:999px;
-  text-decoration:none;box-shadow:0 6px 16px -10px rgba(31,36,33,.4);transition:transform var(--fast);
-  -webkit-tap-highlight-color:transparent;}
-.mode-switch:hover{transform:translateY(-1px);}
-.mode-switch:active{transform:scale(.97);}
 @keyframes breathe{0%,100%{transform:scale(1);}50%{transform:scale(1.045);}}
 body.splash-mode .float{display:none;}
 body.in-store .float{display:none;}   /* in the store the sound/passport live inside the top bar */
@@ -449,7 +449,8 @@ body.in-store .float{display:none;}   /* in the store the sound/passport live in
   .basketbtn .bk-label{display:none;}
   .basketbtn .bk-ico{display:inline;}
 }
-/* narrower phones (iPhone 12–16 standard = 390px, etc.): claw back room so the full ヨリミチ still fits. Ellipsis remains as a safety net below this. */
+/* narrower phones (iPhone 12–16 standard = 390px, etc.): claw back room so the
+   full ヨリミチ still fits. Ellipsis remains as a safety net below this. */
 @media (max-width:413px){
   .topbar .wrap{gap:3px;}
   .logo{font-size:14.5px;}
@@ -463,7 +464,323 @@ body.in-store .float{display:none;}   /* in the store the sound/passport live in
   *{animation-duration:.001s !important;transition-duration:.001s !important;}
   .reader.active .ripple{animation:none;opacity:0;}
 }
-:focus-visible{outline:3px solid var(--sky);outline-offset:2px;border-radius:6px;}
+/* ============================================================
+   PIXEL-UI OVERRIDE LAYER — full retro conversion of all HTML surfaces.
+   Dark JRPG dialog boxes, chunky pixel font, hard borders, square corners,
+   no soft shadows. Loaded last so it wins the cascade.
+   ============================================================ */
+:root{
+  --px-navy:#1b2440;      /* dialog background */
+  --px-navy2:#141b30;     /* darker panel */
+  --px-edge:#0c1020;      /* outer hard border */
+  --px-light:#e8ecf5;     /* light text */
+  --px-dim:#98a4c4;       /* dim text */
+  --px-green:#2fbf87;
+  --px-green-d:#0d6a4a;
+  --px-yellow:#f5c542;
+  --px-red:#e05a5a;
+  --px-line:#3a4670;      /* inner divider */
+}
+:focus-visible{outline:3px solid var(--px-green);outline-offset:2px;}
+
+/* pixel fonts everywhere */
+body, button, input, .mono, .jp,
+h1,h2,h3,.logo,.brandmark,.price,.receipt,.iccard b,.iccard .bal{
+  font-family:"DotGothic16","Press Start 2P",monospace !important;
+  -webkit-font-smoothing:none; font-smooth:never;
+}
+.px-latin, .brandmark, .cta, .splash-cta, .paymethod b{
+  font-family:"Press Start 2P","DotGothic16",monospace !important;
+  letter-spacing:0;
+}
+body{ image-rendering:pixelated; }
+
+/* nuke rounded corners and soft shadows globally */
+.screen *, .whud *, #dialogBox *, #modal *, #drawer *, #passportOverlay *,
+.a2hs, .toast, .iconbtn, .cta, .chip, .balance, .basketbtn, .timepill, .topback,
+.product, .add, .aisle, .bitem, .stepper button, .recommend, .clerk-bubble,
+.scanlist, .askbox, .paymethod, .reader, .iccard, .bill, .receipt, .dbox-panel,
+.dbox-row, .dbox-close, .radd, .jchoose-card, .jchoose-time, .fieldprompt, .actbtn{
+  border-radius:0 !important;
+  box-shadow:none !important;
+}
+
+/* hard 3px pixel border helper look for panels */
+.px-panel{
+  background:var(--px-navy);
+  border:3px solid var(--px-edge);
+  box-shadow:inset 0 0 0 2px var(--px-navy), inset 0 0 0 3px var(--px-line) !important;
+  color:var(--px-light);
+}
+
+/* ---- store HUD ---- */
+.whud{
+  background:var(--px-navy) !important;
+  border-bottom:3px solid var(--px-edge) !important;
+  backdrop-filter:none !important;-webkit-backdrop-filter:none !important;
+}
+.whud .logo{ color:var(--px-green) !important; font-size:12px !important; }
+.whud .timepill,.whud .balance,.whud .basketbtn,.whud .iconbtn,.whud .topback{
+  background:var(--px-navy2) !important; border:2px solid var(--px-line) !important; color:var(--px-light) !important;
+}
+.whud .balance b, .whud .balance{ color:var(--px-yellow) !important; }
+.whud .basketbtn{ background:var(--px-green-d) !important; color:#fff !important; border-color:#093a29 !important;}
+.whud .basketbtn .count{ background:var(--px-yellow) !important; color:#3a2b00 !important; border:2px solid #3a2b00 !important;}
+.whud .iconbtn{ width:34px !important;height:34px !important; }
+
+/* ---- generic buttons / chips / cta ---- */
+.cta,.splash-cta{
+  background:var(--px-green) !important; color:#062a1e !important;
+  border:3px solid var(--px-edge) !important; box-shadow:inset -3px -3px 0 0 var(--px-green-d) !important;
+  font-size:13px !important; padding:16px 22px !important;
+}
+.cta:active,.splash-cta:active{ box-shadow:inset 3px 3px 0 0 var(--px-green-d) !important; }
+.chip{ background:var(--px-navy2) !important; color:var(--px-light) !important; border:2px solid var(--px-line) !important; }
+.chip.on,.chip[aria-pressed="true"]{ background:var(--px-green) !important; color:#062a1e !important; }
+.brandmark{ color:var(--px-green) !important; border:3px solid var(--px-green) !important; font-size:9px !important; }
+.iconbtn{ background:var(--px-navy2) !important; border:2px solid var(--px-line) !important; color:var(--px-light) !important; }
+
+/* ---- JRPG dialog box (shelf browse / clerk / vending) ---- */
+.dbox-panel{
+  background:var(--px-navy) !important;
+  border:3px solid var(--px-edge) !important;
+  box-shadow:0 0 0 2px var(--px-line) inset, 0 -4px 0 0 var(--px-edge) !important;
+  color:var(--px-light);
+}
+.dbox-head{ border-bottom:2px solid var(--px-line) !important; }
+.dbox-head h3,.dbox-head .jp{ color:var(--px-light) !important; font-size:12px !important; }
+.dbox-head .sub{ color:var(--px-dim) !important; }
+.dbox-close{ background:var(--px-navy2) !important; border:2px solid var(--px-line) !important; color:var(--px-light) !important; }
+.dbox-row{ border-bottom:2px solid var(--px-line) !important; }
+.dbox-row .rtxt b{ color:var(--px-light) !important; font-size:11px !important; }
+.dbox-row .rtag{ color:var(--px-dim) !important; }
+.dbox-row .rprice{ color:var(--px-yellow) !important; }
+.dbox-row .radd{ background:var(--px-green) !important; color:#062a1e !important; border:2px solid var(--px-edge) !important; box-shadow:inset -2px -2px 0 0 var(--px-green-d) !important;}
+.dbox-empty,.dbox-foot{ color:var(--px-dim) !important; }
+.dbox-row .rart{ image-rendering:pixelated; }
+
+/* ---- scrim/modal/drawer ---- */
+.scrim{ background:rgba(8,10,20,.66) !important; }
+.modal,.drawer{
+  background:var(--px-navy) !important; color:var(--px-light) !important;
+  border:3px solid var(--px-edge) !important; box-shadow:0 0 0 2px var(--px-line) inset !important;
+}
+.modal h2,.modal h3,.drawer h2,.drawer h3{ color:var(--px-light) !important; font-size:12px !important; }
+
+/* ---- product cards / aisles / basket items / register flow ---- */
+.product,.bitem,.scanlist,.askbox,.recommend,.clerk-bubble,.paymethod,.iccard{
+  background:var(--px-navy2) !important; color:var(--px-light) !important;
+  border:2px solid var(--px-line) !important;
+}
+.product b,.bitem b,.askbox b,.paymethod b{ color:var(--px-light) !important; }
+.price,.receipt,.iccard .bal{ color:var(--px-yellow) !important; }
+.add,.radd,.stepper button{ background:var(--px-green) !important; color:#062a1e !important; border:2px solid var(--px-edge) !important; }
+.aisle{ background:var(--px-navy2) !important; color:var(--px-light) !important; border:2px solid var(--px-line) !important; }
+.aisle.on{ background:var(--px-green) !important; color:#062a1e !important; }
+.paymethod.sel,.paymethod:active{ border-color:var(--px-green) !important; background:var(--px-green-d) !important; color:#fff !important; }
+.reader{ background:var(--px-green-d) !important; border:3px solid var(--px-edge) !important; }
+.bill{ background:var(--px-navy) !important; color:var(--px-light) !important; border:2px solid var(--px-line) !important; }
+.bill.coin{ background:var(--px-yellow) !important; color:#3a2b00 !important; }
+
+/* ---- receipt: keep it lightish (a printed slip) but pixel-bordered ---- */
+.receipt{
+  background:#f3f1e6 !important; color:#2a2a26 !important;
+  border:3px solid var(--px-edge) !important;
+}
+.receipt .rhead{ color:var(--px-green-d) !important; font-size:12px !important; }
+.receipt .stamp{ border:3px solid var(--px-red) !important; color:var(--px-red) !important;
+  border-radius:0 !important; box-shadow:0 0 0 2px #f3f1e6, 0 0 0 5px var(--px-red) !important;
+  font-family:"DotGothic16","Press Start 2P",monospace !important; opacity:1 !important;
+  padding:5px 9px !important; letter-spacing:1px; }
+
+/* ---- passport overlay ---- */
+#passportOverlay{ background:rgba(8,10,20,.7) !important; }
+#passportOverlay .passport, .passport{
+  background:var(--px-navy) !important; color:var(--px-light) !important;
+  border:3px solid var(--px-edge) !important; box-shadow:0 0 0 2px var(--px-line) inset !important;
+}
+.passport h2,.passport h3{ color:var(--px-light) !important; }
+.stamp-earned,.stat{ background:var(--px-navy2) !important; border:2px solid var(--px-line) !important; color:var(--px-light) !important; }
+
+/* ---- journey choice ---- */
+.jchoose-title{ color:var(--px-green) !important; font-size:22px !important; }
+.jchoose-card{ background:var(--px-navy2) !important; border:3px solid var(--px-edge) !important; color:var(--px-light) !important; box-shadow:inset -3px -3px 0 0 var(--px-line) !important;}
+.jchoose-card b{ color:var(--px-light) !important; }
+.jchoose-card span{ color:var(--px-dim) !important; }
+.jchoose-time{ background:var(--px-navy2) !important; border:2px solid var(--px-line) !important; color:var(--px-light) !important; }
+.journey-choose{ background:var(--px-navy) !important; }
+
+/* ---- field prompt + action button + toast ---- */
+.fieldprompt{ background:var(--px-navy) !important; border:2px solid var(--px-light) !important; color:var(--px-light) !important; font-size:10px !important;}
+.actbtn{ background:var(--px-green) !important; border:3px solid var(--px-edge) !important; color:#062a1e !important; box-shadow:inset -3px -3px 0 0 var(--px-green-d) !important; font-size:12px !important;}
+.actbtn:active{ box-shadow:inset 3px 3px 0 0 var(--px-green-d) !important; }
+.toast{ background:var(--px-navy) !important; color:var(--px-light) !important; border:2px solid var(--px-light) !important; font-size:10px !important; }
+.toast-ic{ display:inline-block; vertical-align:middle; }
+.toast-ic svg{ vertical-align:middle; }
+.a2hs{ background:var(--px-navy) !important; color:var(--px-light) !important; border:2px solid var(--px-light) !important; }
+
+/* joystick base gets a subtle pixel ring */
+.joybase{ border:3px solid rgba(232,236,245,.5) !important; }
+
+/* splash */
+.splash{ background:var(--px-navy) !important; }
+.splash-title{ color:var(--px-green) !important; }
+.splash-sub,.splash-hint{ color:var(--px-dim) !important; }
+.mode-switch{ display:inline-block; margin-top:16px; padding:8px 14px; font-family:"DotGothic16","Press Start 2P",monospace;
+  font-size:11px; color:var(--px-light); background:var(--px-navy2); border:2px solid var(--px-line);
+  text-decoration:none; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.mode-switch:active{ background:var(--px-line); }
+.brandmark{ background:transparent !important; }
+
+/* make small body text a touch bigger since DotGothic16 runs small */
+.dbox-row .rtag,.dbox-head .sub,.dbox-foot,.jchoose-card span{ font-size:10px !important; line-height:1.5 !important; }
+
+/* ---- CATCH-ALL: any white/rounded card-like surface anywhere in a screen ---- */
+.screen div, .screen section, .screen article{ box-shadow:none !important; }
+.enjoy,.enjoycard,.modalcard,.modalrow,.paygrid,.paydevice,.passgrid,.ach,.achwrap,
+.chooser,.narr,.pathcard,.pathcards,.counter,.cashtray,.cashstatus,.receiptwrap,
+.scanrow,.askrow,.sectionhead,.center-narrow,.bagnote,.dotnav,.badge,.points,.lowbal,
+.brandline,.empty,.fineprint,.eyebrow,.linkbtn,.backbtn{
+  border-radius:0 !important; box-shadow:none !important;
+}
+.enjoycard,.modalcard,.pathcard,.ach,.bagnote,.scanrow,.askrow,.cashtray,.counter,.paydevice{
+  background:var(--px-navy2) !important; color:var(--px-light) !important;
+  border:2px solid var(--px-line) !important;
+}
+.enjoy{ background:var(--px-navy) !important; }
+.enjoycard h2,.enjoycard .jp,.modalcard h2,.modalcard h3{ color:var(--px-light) !important; font-size:12px !important; }
+.enjoycard .ro,.narr,.eyebrow,.fineprint,.sectionhead,.empty{ color:var(--px-dim) !important; }
+.enjoycard .flavor,.flavor{ color:var(--px-light) !important; }
+.bigart svg,.dbox-row .rart svg,.product svg,.bitem svg,.bigart,.iccard svg{ image-rendering:pixelated !important; }
+.cta.ghost,.cta.small,.linkbtn,.backbtn{ background:var(--px-navy2) !important; color:var(--px-light) !important; border:2px solid var(--px-line) !important; box-shadow:none !important; }
+.cta.small{ background:var(--px-green) !important; color:#062a1e !important; }
+.dotnav i{ background:var(--px-line) !important; border-radius:0 !important; }
+.dotnav i.on{ background:var(--px-green) !important; }
+.badge,.points{ background:var(--px-yellow) !important; color:#3a2b00 !important; }
+.lowbal{ color:var(--px-red) !important; }
+.paygrid .paymethod,.paymethod{ background:var(--px-navy2) !important; border:2px solid var(--px-line) !important; color:var(--px-light) !important; }
+.passgrid .stamp,.passgrid .ach,.stamp-earned{ background:var(--px-navy2) !important; border:2px solid var(--px-line) !important; border-radius:0 !important; box-shadow:none !important; }
+.passgrid .stamp.locked,.ach.locked{ filter:none !important; opacity:.4 !important; }
+.passgrid .stamp .sname{ color:var(--px-light) !important; }
+.passgrid .stamp .cnt{ background:var(--px-green) !important; color:#062a1e !important; border-radius:0 !important; }
+.modal .modalcard,.modalrow{ background:var(--px-navy2) !important; }
+.chooser button,.modalrow button{ background:var(--px-navy) !important; color:var(--px-light) !important; border:2px solid var(--px-line) !important; }
+.chooser button.on,.modalrow button.on{ background:var(--px-green) !important; color:#062a1e !important; }
+.sectionhead{ border-bottom:2px solid var(--px-line) !important; }
+
+/* ---- storefront SVG on the splash: give it a pixel frame instead of soft card ---- */
+.scene,.splash-inner svg,.storefront{ border-radius:0 !important; box-shadow:none !important; }
+
+/* ---- EMOJI → pixel rendering. Emoji are font glyphs; we can't repaint them, but we
+        can render them crisp and sit them in pixel chips so they read as game icons. ---- */
+.tp-mini,.whud .iconbtn,.jchoose-emoji,.timepill,.bagicon,.splash-hint{
+  image-rendering:pixelated;
+}
+/* wrap emoji-bearing spots on a dark chip so stray emoji don't float on white */
+.obtain-hint,.ach .hint,.enjoycard .bagnote span{ color:var(--px-dim) !important; }
+
+/* catch any leftover pure-white backgrounds inside screens */
+.screen [style*="background:#fff"],.screen [style*="background:#FFFFFF"],
+.screen [style*="background: #fff"]{ background:var(--px-navy2) !important; color:var(--px-light) !important; }
+
+
+/* ============================================================ WORLD ENGINE */
+#world{position:fixed;inset:0;z-index:1;background:#1a1f2e;overflow:hidden;}
+#stage{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  image-rendering:pixelated;image-rendering:-moz-crisp-edges;image-rendering:crisp-edges;
+  box-shadow:0 0 0 1px rgba(0,0,0,.2);touch-action:none;pointer-events:auto;}
+#app{position:absolute;inset:0;z-index:10;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;display:flex;flex-direction:column;pointer-events:none;}
+#app:empty{background:none;}
+#app:not(:empty){pointer-events:auto;background:var(--floor);}
+
+/* store HUD — sits above the canvas only while inside the store */
+.whud{position:absolute;top:0;left:0;right:0;z-index:3;display:none;align-items:center;gap:6px;
+  padding:calc(8px + env(safe-area-inset-top,0px)) 10px 8px;
+  background:linear-gradient(180deg,rgba(255,255,255,.97),rgba(255,255,255,.9));
+  border-bottom:1px solid var(--line);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+body.rpg-in-store .whud{display:flex;}
+.whud .logo{font-size:15px;padding:6px 10px;flex-shrink:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.whud .logo small{display:none;}
+.whud .timepill{padding:6px 7px;}
+.whud .timepill .tp-full{display:none;}
+.whud .timepill .tp-mini{display:inline;font-size:15px;}
+.whud .balance{padding:5px 8px;}
+.whud .balance .ic{display:none;}
+.whud .basketbtn{padding:6px 9px;font-size:13px;}
+.whud .basketbtn .bk-label{display:none;}
+.whud .iconbtn{width:32px;height:32px;font-size:14px;}
+
+/* virtual joystick */
+.joywrap{position:fixed;left:0;right:0;bottom:0;z-index:4;display:none;
+  padding-bottom:calc(18px + env(safe-area-inset-bottom,0px));pointer-events:none;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
+body.rpg-active .joywrap{display:block;}
+.joybase{position:absolute;left:22px;bottom:20px;width:104px;height:104px;border-radius:50%;
+  background:rgba(20,24,43,.28);border:2px solid rgba(255,255,255,.55);pointer-events:auto;touch-action:none;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;}
+.joyknob{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;
+  background:rgba(255,255,255,.85);border:2px solid rgba(20,24,43,.35);box-shadow:0 3px 8px rgba(0,0,0,.25);
+  transition:transform .06s linear;pointer-events:none;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
+.actbtn{position:absolute;right:26px;bottom:34px;width:66px;height:66px;border-radius:50%;
+  background:rgba(14,158,110,.88);color:#fff;font-weight:800;font-size:14px;letter-spacing:.02em;
+  border:2px solid rgba(255,255,255,.7);box-shadow:0 6px 16px -6px rgba(0,0,0,.5);
+  display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.2;
+  pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;
+  -webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;}
+.actbtn:active{transform:scale(.92);}
+.actbtn.hidden{opacity:0;pointer-events:none;}
+
+/* journey choice screen */
+.journey-choose{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:70vh;text-align:center;padding:20px;}
+.jchoose-title{font-size:44px;color:var(--brand-deep);}
+.jchoose-sub{color:var(--ink-soft);font-size:14px;}
+.jchoose-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:6px;}
+.jchoose-card{width:150px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px 14px;
+  display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 10px 24px -18px rgba(0,0,0,.4);cursor:pointer;transition:transform .12s;}
+.jchoose-card:active{transform:scale(.97);}
+.jchoose-card b{font-family:"Zen Maru Gothic";font-size:15px;}
+.jchoose-card span{font-size:11.5px;color:var(--ink-soft);line-height:1.35;}
+.jchoose-emoji{font-size:38px;}
+.jchoose-time{margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 16px;font-size:12.5px;font-weight:700;color:var(--ink-soft);cursor:pointer;}
+
+/* field prompt bubble ("press A") */
+.fieldprompt{position:fixed;left:50%;bottom:calc(122px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+  z-index:4;background:rgba(20,24,43,.82);color:#fff;font-size:12.5px;font-weight:700;
+  padding:8px 14px;border-radius:999px;display:none;pointer-events:none;white-space:nowrap;}
+.fieldprompt.on{display:block;animation:fade .18s ease both;}
+
+/* JRPG dialog box — used for shelf browsing */
+.dialogbox{position:fixed;inset:0;z-index:6;display:none;flex-direction:column;justify-content:flex-end;
+  background:rgba(10,14,20,.38);}
+.dialogbox.on{display:flex;animation:fade .18s ease both;}
+.dbox-panel{background:var(--floor);border-top:3px solid var(--brand-deep);border-radius:20px 20px 0 0;
+  max-height:78vh;display:flex;flex-direction:column;
+  padding-bottom:calc(14px + env(safe-area-inset-bottom,0px));}
+.dbox-head{display:flex;align-items:center;gap:10px;padding:16px 18px 10px;border-bottom:1px solid var(--line);}
+.dbox-head .ic{font-size:22px;}
+.dbox-head h3{font-family:"Zen Maru Gothic";font-size:17px;}
+.dbox-head .sub{font-size:11.5px;color:var(--ink-soft);margin-left:auto;}
+.dbox-close{flex:none;width:30px;height:30px;border-radius:50%;background:#fff;border:1px solid var(--line);
+  font-size:15px;color:var(--ink-soft);}
+.dbox-body{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px 4px;}
+.dbox-row{display:flex;align-items:center;gap:12px;padding:10px 6px;border-bottom:1px solid var(--line);}
+.dbox-row:last-child{border-bottom:none;}
+.dbox-row .rart{width:44px;height:44px;flex:none;}
+.dbox-row .rart svg{width:100%;height:100%;}
+.dbox-row .rtxt{flex:1;min-width:0;}
+.dbox-row .rtxt b{display:block;font-size:14px;}
+.dbox-row .rtxt .rtag{font-size:11.5px;color:var(--ink-soft);}
+.dbox-row .rprice{font-weight:800;font-size:13.5px;flex:none;}
+.dbox-row .radd{flex:none;width:34px;height:34px;border-radius:50%;background:var(--brand);color:#fff;
+  font-size:18px;font-weight:800;box-shadow:0 6px 12px -6px var(--brand-deep);}
+.dbox-empty{padding:24px 8px;text-align:center;color:var(--ink-soft);font-size:13px;}
+.dbox-foot{padding:10px 18px 2px;text-align:center;font-size:11.5px;color:var(--ink-soft);}
+
+@media (max-width:413px){
+  .whud .logo{font-size:13.5px;}
+}
 </style>
 </head>
 <body>
@@ -471,6 +788,16 @@ body.in-store .float{display:none;}   /* in the store the sound/passport live in
   <button class="iconbtn js-sound" id="soundBtn" title="Sound" aria-label="Toggle sound">🔊</button>
   <button class="iconbtn js-pass" id="passBtn" title="Konbini passport" aria-label="Open passport">📖</button>
 </div>
+<div id="world">
+  <canvas id="stage"></canvas>
+  <div class="whud" id="whud"></div>
+</div>
+<div class="joywrap">
+  <div class="joybase" id="joyBase"><div class="joyknob" id="joyKnob"></div></div>
+  <button class="actbtn" id="actBtn">A</button>
+</div>
+<div class="fieldprompt" id="fieldPrompt"></div>
+<div class="dialogbox" id="dialogBox"></div>
 <div id="app"></div>
 <div class="scrim" id="scrim"></div>
 <div class="drawer" id="drawer" aria-hidden="true"></div>
@@ -483,7 +810,7 @@ body.in-store .float{display:none;}   /* in the store the sound/passport live in
 <div class="toast" id="toast"></div>
 <div class="rotate-gate" id="rotateGate" aria-hidden="true">
   <div class="ri">
-    <div class="rot">📱</div>
+    <div class="rot" id="rotIcon">📱</div>
     <h2 class="jp">Turn your phone upright</h2>
     <p>ヨリミチ is best in portrait — rotate back and the konbini will be waiting.</p>
   </div>
@@ -637,104 +964,449 @@ const Sound = (() => {
 const S = `stroke="#1F2421" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"`;
 function svg(inner,vb){ return `<svg viewBox="${vb||'0 0 100 100'}" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`; }
 
-const Art = {
-  onigiri:(fill="#fff",dot="#E8622A")=>svg(`
-    <path d="M50 12 L86 80 Q88 86 80 86 L20 86 Q12 86 14 80 Z" fill="${fill}" ${S}/>
-    <rect x="34" y="58" width="32" height="26" rx="3" fill="#2b2b2b" ${S}/>
-    <circle cx="50" cy="48" r="6" fill="${dot}" ${S}/>`),
-  sando:(cream="#fff",bits="#E8622A",bread="#FBE7B6")=>svg(`
-    <path d="M16 30 L84 30 L52 82 Z" fill="${bread}" ${S}/>
-    <path d="M22 38 L78 38 L52 70 Z" fill="${cream}" stroke="none"/>
-    <circle cx="42" cy="48" r="5" fill="${bits}"/><circle cx="56" cy="46" r="4" fill="${bits}"/>
-    <circle cx="50" cy="56" r="4" fill="${bits}"/>
-    <path d="M16 30 L84 30 L52 82 Z" fill="none" ${S}/>
-    <path d="M18 26 L82 26 L82 34 L18 34 Z" fill="${bread}" ${S}/>`),
-  bento:(top="#E8622A")=>svg(`
-    <rect x="14" y="30" width="72" height="50" rx="6" fill="#fff" ${S}/>
-    <rect x="14" y="22" width="72" height="14" rx="5" fill="${top}" ${S}/>
-    <rect x="22" y="46" width="24" height="26" rx="3" fill="#F4F3EC" ${S}/>
-    <rect x="52" y="46" width="26" height="12" rx="3" fill="#FBE7B6" ${S}/>
-    <circle cx="60" cy="68" r="6" fill="#E8622A" ${S}/>
-    <circle cx="72" cy="68" r="5" fill="#7bbf5a" ${S}/>`),
-  fried:(n="#E2A23B")=>svg(`
-    <path d="M30 84 L70 84 L74 44 L26 44 Z" fill="#fff" ${S}/>
-    <path d="M26 44 L74 44 L70 36 L30 36 Z" fill="#0E9E6E" ${S}/>
-    <circle cx="42" cy="42" r="11" fill="${n}" ${S}/>
-    <circle cx="58" cy="40" r="10" fill="${n}" ${S}/>
-    <circle cx="50" cy="54" r="11" fill="${n}" ${S}/>`),
-  can:(body="#2db98a",band="#fff")=>svg(`
-    <rect x="32" y="16" width="36" height="68" rx="9" fill="${body}" ${S}/>
-    <rect x="32" y="40" width="36" height="20" fill="${band}" stroke="none"/>
-    <rect x="32" y="16" width="36" height="68" rx="9" fill="none" ${S}/>
-    <ellipse cx="50" cy="18" rx="18" ry="5" fill="#cfd3d0" ${S}/>`),
-  bottle:(body="#bfe3ef",cap="#0E9E6E")=>svg(`
-    <rect x="42" y="12" width="16" height="10" rx="2" fill="${cap}" ${S}/>
-    <path d="M40 22 L60 22 L62 34 Q66 38 66 46 L66 80 Q66 86 60 86 L40 86 Q34 86 34 80 L34 46 Q34 38 38 34 Z" fill="${body}" ${S}/>
-    <rect x="34" y="50" width="32" height="22" rx="2" fill="#fff" stroke="none" opacity=".85"/>`),
-  bun:(c="#F4ECDE")=>svg(`
-    <path d="M50 24 Q78 24 80 54 Q82 80 50 80 Q18 80 20 54 Q22 24 50 24Z" fill="${c}" ${S}/>
-    <path d="M40 40 Q50 32 60 40" fill="none" ${S}/>
-    <path d="M36 52 Q50 44 64 52" fill="none" ${S}/>`),
-  cup:(body="#E94F6B",top="#fff")=>svg(`
-    <path d="M30 34 L70 34 L64 84 L36 84 Z" fill="${body}" ${S}/>
-    <ellipse cx="50" cy="34" rx="22" ry="7" fill="${top}" ${S}/>
-    <rect x="38" y="46" width="24" height="22" rx="3" fill="#fff" stroke="none" opacity=".85"/>`),
-  bar:(c="#C0392B")=>svg(`
-    <rect x="22" y="30" width="56" height="40" rx="6" fill="${c}" ${S}/>
-    <rect x="30" y="40" width="40" height="20" rx="3" fill="#fff" stroke="none" opacity=".85"/>
-    <path d="M22 50 L78 50" stroke="#fff" stroke-width="2" opacity=".5"/>`),
-  pocky:(c="#8B5A2B")=>svg(`
-    <rect x="24" y="26" width="52" height="50" rx="5" fill="#E8334F" ${S}/>
-    <rect x="58" y="14" width="6" height="44" rx="3" fill="#F4E3C8" ${S}/>
-    <rect x="58" y="14" width="6" height="14" rx="3" fill="${c}" stroke="none"/>
-    <rect x="32" y="40" width="28" height="14" rx="2" fill="#fff" stroke="none" opacity=".85"/>`),
-  popsicle:(c="#5BB7E0")=>svg(`
-    <rect x="44" y="64" width="12" height="26" rx="4" fill="#E2C089" ${S}/>
-    <path d="M30 22 Q30 14 50 14 Q70 14 70 22 L70 60 Q70 70 50 70 Q30 70 30 60 Z" fill="${c}" ${S}/>`),
-  tub:(c="#5b3a86")=>svg(`
-    <path d="M28 36 L72 36 L68 82 L32 82 Z" fill="${c}" ${S}/>
-    <ellipse cx="50" cy="36" rx="24" ry="8" fill="#F4F3EC" ${S}/>
-    <path d="M44 30 Q50 22 56 30" fill="#fff" ${S}/>`),
-  purin:(c="#F2C14E")=>svg(`
-    <path d="M28 44 Q50 30 72 44 L66 80 Q50 86 34 80 Z" fill="${c}" ${S}/>
-    <path d="M40 40 Q50 50 60 40 Q56 34 50 34 Q44 34 40 40Z" fill="#8B5A2B" ${S}/>`),
-  cake:(c="#F6B9C5")=>svg(`
-    <path d="M22 60 L70 38 L80 56 L40 80 Z" fill="#FBE7B6" ${S}/>
-    <path d="M22 60 Q40 50 48 64" fill="none" stroke="${c}" stroke-width="8" stroke-linecap="round"/>
-    <path d="M44 50 Q58 42 66 54" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/>`),
-  oden:(c="#E9D9A6")=>svg(`
-    <path d="M22 50 Q50 44 78 50 L74 82 Q50 88 26 82 Z" fill="${c}" ${S}/>
-    <circle cx="40" cy="60" r="7" fill="#fff" ${S}/>
-    <rect x="54" y="40" width="6" height="28" rx="3" fill="#E8622A" ${S}/>
-    <circle cx="60" cy="40" r="8" fill="#E2A23B" ${S}/>
-    <rect x="34" y="34" width="5" height="26" rx="2" fill="#caa86a" ${S}/>`),
-  rollcake:(c="#F6E6B0")=>svg(`
-    <ellipse cx="50" cy="50" rx="30" ry="26" fill="${c}" ${S}/>
-    <ellipse cx="50" cy="50" rx="16" ry="13" fill="#fff" ${S}/>
-    <ellipse cx="50" cy="50" rx="7" ry="5" fill="#E8B04B" ${S}/>`),
-  warabi:()=>svg(`
-    <path d="M30 38 L70 38 L66 80 L34 80 Z" fill="#cfcfc6" ${S}/>
-    <rect x="38" y="46" width="9" height="9" rx="2" fill="#6b6b62" stroke="none"/>
-    <rect x="52" y="50" width="9" height="9" rx="2" fill="#6b6b62" stroke="none"/>
-    <rect x="44" y="60" width="9" height="9" rx="2" fill="#6b6b62" stroke="none"/>
-    <path d="M30 38 L70 38" stroke="#8B6F2B" stroke-width="6"/>`),
-  sakura:()=>svg(`
-    <path d="M30 38 L70 38 L66 80 L34 80 Z" fill="#F6C8D6" ${S}/>
-    <path d="M40 50 q10 -8 20 0" stroke="#7a9a4a" stroke-width="5" fill="none"/>
-    <circle cx="50" cy="58" r="5" fill="#C0392B" ${S}/>`),
-  basket:()=>svg(`
-    <path d="M20 38 L80 38 L72 84 L28 84 Z" fill="#fff" ${S}/>
-    <path d="M30 38 Q30 18 50 18 Q70 18 70 38" fill="none" ${S}/>
-    <path d="M20 50 L80 50 M32 38 L36 84 M50 38 L50 84 M68 38 L64 84" stroke="#1F2421" stroke-width="3" opacity=".4"/>`),
-  rice:()=>svg(`<path d="M50 18 L84 82 Q86 88 78 88 L22 88 Q14 88 16 82 Z" fill="#fff" ${S}/>
-    <circle cx="40" cy="60" r="3" fill="#E94F6B"/><circle cx="58" cy="56" r="3" fill="#E94F6B"/>`),
-  bag:(band="#0E9E6E")=>svg(`
-    <path d="M35 27 Q35 11 44 11 Q50 11 50 23" fill="none" ${S}/>
-    <path d="M65 27 Q65 11 56 11 Q50 11 50 23" fill="none" ${S}/>
-    <path d="M24 27 L76 27 L70 88 Q70 91 66 91 L34 91 Q30 91 30 88 Z" fill="#fff" ${S}/>
-    <rect x="31" y="45" width="38" height="14" rx="2" fill="${band}"/>
-    <circle cx="50" cy="52" r="4" fill="#fff"/>`)
+/* ---- PXI: tiny pixel-art icons that replace emoji in the UI.
+   Each icon is an 8x8 grid of palette chars -> inline SVG rects. Crisp at any size. */
+const PXI_PAL = {
+  ' ':null,'.':'#00000000',
+  k:'#20241c', w:'#ffffff', y:'#f5c542', o:'#e8862a', r:'#e05a5a', g:'#2fbf87',
+  G:'#0d6a4a', b:'#5bb7e0', B:'#2f6fb0', p:'#e58fb0', P:'#c0466a', s:'#ffe0c2',
+  n:'#20304a', l:'#e0f4fa', d:'#8a6f4c', m:'#96a0a4', c:'#c0392b', t:'#78c878',
+  W:'#e8ecf5', x:'#3a4670',
 };
+const PXI = {
+  // times of day
+  sun:["  yyyy  "," yyooyy "," yoooooy"," yoooooy"," yoooooy"," yyooyy ","  yyyy  ","        "],
+  cloud:["        ","  WWWW  "," WWWWWW ","WWWWWWWW","WWWWWWWW"," WWWWWW ","        ","        "],
+  sunset:["   yy   ","  yooy  "," yoooooy","yooooooy","nnnnnnnn","  nnnn  ","        ","        "],
+  moon:["  WWW   "," WW     ","WW      ","WW      ","WW      "," WW   W ","  WWW   ","        "],
+  // seasons
+  sakura:["  p p   "," ppppp  ","pp P pp ","  ppp   "," pp pp  "," p   p  ","        ","        "],
+  chime:["  mm    ","  mm    "," bbbb   "," bBBb   "," bbbb   ","  bb    ","  yy    ","        "],
+  maple:["   r    ","  rrr   ","r rrr r ","rrrrrrr "," rrrrr  ","  r r   ","  d d   ","        "],
+  snow:["  W W   ","W WWW W "," WWWWW  ","WWWWWWW "," WWWWW  ","W WWW W ","  W W   ","        "],
+  // sections
+  onigiri:["  ww    "," wwww   ","wwwwww  ","wwkkww  ","wwwwww  ","wwwwww  ","        ","        "],
+  sando:["        "," oooooo ","o wwww o","o llll o","o wwww o"," GGGGGG ","        ","        "],
+  fried:["  oo    "," oooo   ","oooooo  ","oooooo  "," oooo   ","  dd    ","  dd    ","        "],
+  drink:[" bbbb   "," bllb   "," bllb   "," bllb   "," bllb   "," bbbb   ","        ","        "],
+  candy:["  cc    "," ccccc  ","cc c cc "," ccccc  ","  ccc   ","  k k   ","        ","        "],
+  icecream:["  ll    "," llll   "," pppp   ","  dd    ","  dd    ","  dd    ","        ","        "],
+  flower:["  p p   "," ppppp  ","p pyp p "," ppppp  ","  ggg   ","   g    ","   g    ","        "],
+  cart:["W    W  ","W wwww  ","W wwww  ","W wwww  ","  k  k  ","        ","        ","        "],
+  // misc UI
+  soundOn:["   gg   ","  ggg g "," gggg gg","ggggg  g"," gggg gg","  ggg g ","   gg   ","        "],
+  soundOff:["   gg   ","  ggg   "," gggg r ","gggggr r"," ggggr r","  gggr  ","   gg   ","        "],
+  book:[" WWWWWW "," WkkkkW "," WkWWkW "," WkkkkW "," WkWWkW "," WkkkkW "," WWWWWW ","        "],
+  person:["  kkk   "," kkkkk  ","  sss   ","  sss   "," GGGGG  ","GGGGGGG "," GG GG  ","        "],
+  walk:["  ss    ","  ss    "," GGGG   ","G GG G  ","  GG    "," n  n   ","n    n  ","        "],
+  train:["gggggg  ","gllllg  ","gllllg  ","gggggg  ","g    g  ","gg  gg  "," k  k   ","        "],
+  cash:[" GGGGGG "," GllllG "," GlyylG "," GllllG "," GGGGGG ","        ","        ","        "],
+  card:["GGGGGGGG","G      G","GkkkkkkG","G      G","G  yy  G","GGGGGGGG","        ","        "],
+  star:["   y    ","  yyy   ","yyyyyyy "," yyyyy  ","  y y   "," y   y  ","        ","        "],
+  crown:["y  y  y ","y yy y y","yyyyyyy "," yyyyy  "," yyyyy  ","        ","        ","        "],
+  sparkle:["   W    ","   W    "," W WWW W","   W    ","   W    ","        ","        ","        "],
+  lock:[" kkkk   ","k    k  ","kkkkkk  ","k yy k  ","k yy k  ","kkkkkk  ","        ","        "],
+  party:["  y y   "," y P y  ","  ppp   "," pPppP  ","p ppp p ","        ","        ","        "],
+  onsen:[" b  b  b","  b  b  ","        "," dddddd ","d dddd d"," dddddd ","        ","        "],
+  box:[" dddddd "," d    d "," d    d "," d    d "," dddddd ","        ","        ","        "],
+  clock:["  WWWW  "," W    W ","W  k   W","W  kkk W","W      W"," W    W ","  WWWW  ","        "],
+  beach:["  y     "," yyy  t ","  y  ttt","      t ","bbbbbbbb","bbbbbbbb","        ","        "],
+  leaf:["   g    ","  ggg   "," ggggg  ","ggggggg "," ggggg  ","   g    ","   g    ","        "],
+  check:["      g ","     gg ","g   gg  ","gg gg   "," ggg    ","  g     ","        ","        "],
+  cross:["r    r  ","rr  rr  "," rrrr   ","  rr    "," rrrr   ","rr  rr  ","r    r  ","        "],
+  phone:[" kkkk   ","k WW k  ","k WW k  ","k WW k  ","k WW k  ","k kk k  "," kkkk   ","        "],
+  penguin:["  kkkk  "," kkkkkk "," kwwkkw ","kkskksk ","kkooookk","kkkkkkkk"," oo  oo ","        "],
+  qr:["kkkkkkkk","k kk k k","k kk kkk","kkk k kk","k k kk k","k kkk kk","kkk kk k","        "],
+};
+function pxIcon(name, px){
+  const g=PXI[name]; if(!g) return "";
+  const size=px||16, cell=size/8;
+  let rects="";
+  for(let y=0;y<8;y++){ const row=g[y]||""; for(let x=0;x<8;x++){
+    const c=PXI_PAL[row[x]]; if(!c||c==='#00000000') continue;
+    rects+=`<rect x="${x*cell}" y="${y*cell}" width="${cell}" height="${cell}" fill="${c}"/>`;
+  }}
+  return `<svg class="pxi" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="image-rendering:pixelated;vertical-align:middle" xmlns="http://www.w3.org/2000/svg">${rects}</svg>`;
+}
+const TIME_ICON = {morning:"sun",day:"cloud",evening:"sunset",late:"moon"};
+const SEASON_ICON = {spring:"sakura",summer:"chime",autumn:"maple",winter:"snow"};
+const SECTION_ICON = {onigiri:"onigiri",sando:"sando",hot:"fried",drinks:"drink",sweets:"candy",ice:"icecream",seasonal:"flower",all:"cart"};
+
+const Art = (()=>{
+  const OUT="#20241c";
+  function pxArt(grid, cmap){
+    const CELL=100/16; let rects="";
+    for(let y=0;y<16;y++){ const row=grid[y]||""; for(let x=0;x<16;x++){
+      const ch=row[x]; if(!ch||ch===" ") continue;
+      const c=cmap[ch]; if(!c) continue;
+      rects+=`<rect x="${(x*CELL).toFixed(2)}" y="${(y*CELL).toFixed(2)}" width="${CELL.toFixed(2)}" height="${CELL.toFixed(2)}" fill="${c}"/>`;
+    }}
+    return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">${rects}</svg>`;
+  }
+  function shade(hex,amt){ const n=parseInt(hex.slice(1),16); let r=(n>>16&255)+amt,g=(n>>8&255)+amt,b=(n&255)+amt; r=Math.max(0,Math.min(255,r));g=Math.max(0,Math.min(255,g));b=Math.max(0,Math.min(255,b)); return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1); }
+  return {
+  onigiri:(fill="#fff",dot="#E8622A")=>pxArt([
+    "                ",
+    "       oo       ",
+    "      offo       ".slice(0,16),
+    "      offo       ".slice(0,16),
+    "     offffo      ".slice(0,16),
+    "     offdfo      ".slice(0,16),
+    "    offdddfo     ".slice(0,16),
+    "    offdddfo     ".slice(0,16),
+    "   offffffffo    ".slice(0,16),
+    "   oNNffffNNo    ".slice(0,16),
+    "  oNNNffffNNNo   ".slice(0,16),
+    "  oNNNNNNNNNNo   ".slice(0,16),
+    "  oNNNNNNNNNNo   ".slice(0,16),
+    "  oooooooooooo   ".slice(0,16),
+    "                ",
+    "                ",
+  ],{o:OUT,f:fill,d:dot,N:"#2b2b2b"}),
+  rice:(fill="#fff")=>pxArt([
+    "                ",
+    "       oo       ",
+    "      offo       ".slice(0,16),
+    "      offo       ".slice(0,16),
+    "     offffo      ".slice(0,16),
+    "     offpfo      ".slice(0,16),
+    "    offfffo      ".slice(0,16),
+    "    offfpffo     ".slice(0,16),
+    "   offffffffo    ".slice(0,16),
+    "   offpfffffo    ".slice(0,16),
+    "  offfffffpfo    ".slice(0,16),
+    "  offffffffffo   ".slice(0,16),
+    "  oooooooooooo   ".slice(0,16),
+    "                ",
+    "                ",
+    "                ",
+  ],{o:OUT,f:fill,p:"#E94F6B"}),
+  sando:(cream="#fff",bits="#E8622A",bread="#FBE7B6")=>pxArt([
+    "                ",
+    "    oooooooo    ",
+    "   obbbbbbbbo   ",
+    "   obbbbbbbbo   ",
+    "   occcccccco   ",
+    "   ocIccccIco   ",
+    "   occcccccco   ",
+    "   ocIcccccco   ",
+    "   obccccccbo   ",
+    "    obbbbbbo    ",
+    "     oo  oo     ",
+    "      o  o      ",
+    "                ",
+    "                ",
+    "                ",
+    "                ",
+  ],{o:OUT,b:bread,c:cream,I:bits}),
+  bento:(top="#E8622A")=>pxArt([
+    "                ",
+    "  otttttttttto  ",
+    "  otttttttttto  ",
+    "  oooooooooooo  ",
+    "  offfogggggfo  ",
+    "  offfogggggfo  ",
+    "  offfooooooo   ".slice(0,16),
+    "  ofRfobbbbbo   ".slice(0,16),
+    "  offfobbbbbo   ".slice(0,16),
+    "  offfogggggo   ".slice(0,16),
+    "  oooooooooooo  ",
+    "                ",
+    "                ",
+    "                ",
+    "                ",
+    "                ",
+  ],{o:OUT,t:top,f:"#fff",g:"#F4F3EC",b:"#FBE7B6",R:"#E8622A"}),
+  fried:(n="#E2A23B")=>pxArt([
+    "                ",
+    "      nnnn      ",
+    "     nNNNNn     ",
+    "    nNNNNNNn    ",
+    "   nNNNNNNNNn   ",
+    "   nNNNNNNNNn   ",
+    "    nNNNNNNn    ",
+    "   ogNNNNNNgo   ",
+    "   oggggggggo   ",
+    "   oggggggggo   ",
+    "    oggggggo    ",
+    "    oggggggo    ",
+    "     oooooo     ",
+    "                ",
+    "                ",
+    "                ",
+  ],{o:OUT,n:n,N:shade(n,-30),g:"#0E9E6E"}),
+  can:(body="#2db98a",band="#fff")=>pxArt([
+    "                ",
+    "     oCCCCo     ",
+    "     ommmmo     ",
+    "    obbbbbbo    ",
+    "    obbbbbbo    ",
+    "    oBBBBBBo    ",
+    "    oWWWWWWo    ",
+    "    oWWWWWWo    ",
+    "    oBBBBBBo    ",
+    "    obbbbbbo    ",
+    "    obbbbbbo    ",
+    "    obbbbbbo    ",
+    "    oooooooo    ",
+    "                ",
+    "                ",
+    "                ",
+  ],{o:OUT,b:body,B:shade(body,-25),W:band,C:"#cfd3d0",m:"#e6e9ea"}),
+  bottle:(body="#bfe3ef",cap="#0E9E6E")=>pxArt([
+    "                ",
+    "      occo      ",
+    "      occo      ",
+    "      oCCo      ",
+    "     obbbbo     ",
+    "     obbbbo     ",
+    "    obbbbbbo    ",
+    "    obWWWWbo    ",
+    "    obWWWWbo    ",
+    "    obWWWWbo    ",
+    "    obbbbbbo    ",
+    "    obbbbbbo    ",
+    "    oBBBBBBo    ",
+    "    oobbbboo    ",
+    "     oooooo     ",
+    "                ",
+  ],{o:OUT,b:body,B:shade(body,-25),W:"#ffffff",c:cap,C:shade(cap,-25)}),
+  bun:(c="#F4ECDE")=>pxArt([
+    "                ",
+    "      oooo      ",
+    "    ooccccoo    ",
+    "   occcccccco   ",
+    "  occcccccccco  ",
+    "  occcccccccco  ",
+    " occccccccccco  ".slice(0,16),
+    " occccccccccco  ".slice(0,16),
+    " occccccccccco  ".slice(0,16),
+    " occccccccccco  ".slice(0,16),
+    "  occcccccccco  ",
+    "  ooCCCCCCCCoo  ",
+    "   oooooooooo   ",
+    "                ",
+    "                ",
+    "                ",
+  ],{o:OUT,c:c,C:shade(c,-18)}),
+  cup:(body="#E94F6B",top="#fff")=>pxArt([
+    "                ",
+    "   oTTTTTTTTo   ",
+    "   oWWWWWWWWo   ",
+    "   obbbbbbbbo   ",
+    "   obWWWWWWbo   ",
+    "    obbbbbbo    ",
+    "    obbbbbbo    ",
+    "    oBBBBBBo    ",
+    "    obbbbbbo    ",
+    "    obbbbbbo    ",
+    "     obbbbo     ",
+    "     oBBBBo     ",
+    "     oooooo     ",
+    "                ",
+    "                ",
+    "                ",
+  ],{o:OUT,b:body,B:shade(body,-25),W:"#ffffff",T:top}),
+  bar:(c="#C0392B")=>pxArt([
+    "                ",
+    "                ",
+    "   oooooooooo   ",
+    "   occcccccco   ",
+    "   ocWWWWWWco   ",
+    "   ocWWWWWWco   ",
+    "   occcccccco   ",
+    "   ocCCCCCCco   ",
+    "   occcccccco   ",
+    "   oooooooooo   ",
+    "                ",
+    "                ",
+    "                ",
+    "                ",
+    "                ",
+    "                ",
+  ],{o:OUT,c:c,C:shade(c,-25),W:"#fff"}),
+  pocky:(c="#8B5A2B")=>pxArt([
+    "                ",
+    "          ss    ",
+    "         sss    ",
+    "        sss     ",
+    "   ooooosss     ".slice(0,16),
+    "   oRRRRoss     ",
+    "   oRWWRoss     ",
+    "   oRWWRo s     ",
+    "   oRRRRo       ",
+    "   oRRRRo       ",
+    "   oooooo       ",
+    "                ",
+    "                ",
+    "                ",
+    "                ",
+    "                ",
+  ],{o:OUT,R:"#E8334F",W:"#fff",s:"#F4E3C8"}),
+  popsicle:(c="#5BB7E0")=>pxArt([
+    "                ",
+    "     oooooo     ",
+    "    occcccco    ",
+    "    occcccco    ",
+    "    oCCCCCCo    ",
+    "    occcccco    ",
+    "    occcccco    ",
+    "    oCCCCCCo    ",
+    "    occcccco    ",
+    "     oooooo     ",
+    "      owwo      ",
+    "      owwo      ",
+    "      owwo      ",
+    "      owwo      ",
+    "       oo       ",
+    "                ",
+  ],{o:OUT,c:c,C:shade(c,-25),w:"#E2C089"}),
+  tub:(c="#5b3a86")=>pxArt([
+    "                ",
+    "    oWWWWWWo    ",
+    "   oWWWWWWWWo   ",
+    "   occcccccco   ",
+    "   occcccccco   ",
+    "   ocCCCCCCco   ",
+    "   occcccccco   ",
+    "   occcccccco   ",
+    "    occcccco    ",
+    "    occcccco    ",
+    "    oooooooo    ",
+    "                ",
+    "                ",
+    "                ",
+    "                ",
+    "                ",
+  ],{o:OUT,c:c,C:shade(c,-20),W:"#F4F3EC"}),
+  purin:(c="#F2C14E")=>pxArt([
+    "                ",
+    "                ",
+    "     obbbbo     ",
+    "    obbbbbbo    ",
+    "    oBBBBBBo    ",
+    "    occcccco    ",
+    "   occccccco    ".slice(0,16),
+    "   oCcccccCo    ".slice(0,16),
+    "   occccccco    ".slice(0,16),
+    "   occccccco    ".slice(0,16),
+    "    occccco     ",
+    "    ooooooo     ",
+    "                ",
+    "                ",
+    "                ",
+    "                ",
+  ],{o:OUT,c:c,C:shade(c,-25),b:"#8B5A2B",B:shade("#8B5A2B",-20)}),
+  oden:(c="#E9D9A6")=>pxArt([
+    "                ",
+    "    r     r     ",
+    "    r     r     ",
+    "   orooooooro   ".slice(0,16),
+    "  ocWccooEcco   ".slice(0,16),
+    "  occccooEcco   ".slice(0,16),
+    "  occccccccco   ",
+    " occccccccccco  ".slice(0,16),
+    " occccccccccco  ".slice(0,16),
+    " oCccccccccCo   ".slice(0,16),
+    "  occccccccco   ",
+    "  ooooooooooo   ",
+    "                ",
+    "                ",
+    "                ",
+    "                ",
+  ],{o:OUT,c:c,C:shade(c,-18),W:"#fff",E:"#E8622A",r:"#caa86a"}),
+  rollcake:(c="#F6E6B0")=>pxArt([
+    "                ",
+    "     oooooo     ",
+    "   ooccccccoo   ",
+    "  occcccccccco  ",
+    " occcWWWWcccco  ",
+    " occWWCCWWccco  ",
+    " occWCEECWccco  ",
+    " occWCEECWccco  ",
+    " occWWCCWWccco  ",
+    " occccWWWWcco   ".slice(0,16),
+    "  occccccccco   ",
+    "   oocccccoo    ",
+    "     oooooo     ",
+    "                ",
+    "                ",
+    "                ",
+  ],{o:OUT,c:c,C:shade(c,-15),W:"#fff",E:"#E8B04B"}),
+  warabi:()=>pxArt([
+    "                ",
+    "                ",
+    "   oBBBBBBBBo   ",
+    "   occcccccco   ",
+    "   occgccgcco   ",
+    "   occgccgcco   ",
+    "   occccccgco   ",
+    "   occgccccco   ",
+    "   occccccgco   ",
+    "   occgccccco   ",
+    "   oooooooooo   ",
+    "                ",
+    "                ",
+    "                ",
+    "                ",
+    "                ",
+  ],{o:OUT,c:"#cfcfc6",g:"#6b6b62",B:"#8B6F2B"}),
+  sakura:()=>pxArt([
+    "                ",
+    "                ",
+    "    oppppppo    ",
+    "   oppppppppo   ",
+    "   oppppRppppo  ".slice(0,16),
+    "   oppRRRRpppo  ".slice(0,16),
+    "   oppppRppppo  ".slice(0,16),
+    "   oLppppppppo  ".slice(0,16),
+    "   oLLppppLLpo  ".slice(0,16),
+    "    oLLLLLLo    ",
+    "    oooooooo    ",
+    "                ",
+    "                ",
+    "                ",
+    "                ",
+    "                ",
+  ],{o:OUT,p:"#F6C8D6",R:"#C0392B",L:"#7a9a4a"}),
+  basket:()=>pxArt([
+    "                ",
+    "     oo  oo     ",
+    "    o  oo  o    ",
+    "   o   oo   o   ",
+    "  ooooooooooo   ",
+    "  oWkWkWkWkWo   ",
+    "  oWkWkWkWkWo   ",
+    "  oWkWkWkWkWo   ",
+    "  oWkWkWkWkWo   ",
+    "   ooooooooo    ",
+    "                ",
+    "                ",
+    "                ",
+    "                ",
+    "                ",
+    "                ",
+  ],{o:OUT,W:"#fff",k:"#c9c2ad"}),
+  bag:(band="#0E9E6E")=>pxArt([
+    "                ",
+    "     o    o     ",
+    "    o o  o o    ",
+    "    o o  o o    ",
+    "   ooooooooo    ",
+    "   oWWWWWWWo    ",
+    "   oWWWWWWWo    ",
+    "   obbbbbbbo    ",
+    "   obWbbbWbo    ",
+    "   obbbbbbbo    ",
+    "   oWWWWWWWo    ",
+    "   oWWWWWWWo    ",
+    "   oWWWWWWWo    ",
+    "   ooooooooo    ",
+    "                ",
+    "                ",
+  ],{o:OUT,W:"#fff",b:band}),
+  };
+})();
 
 /* ----------------------------------------------------------- catalog */
 // seasons: 'all' or array of ['spring','summer','autumn','winter']
@@ -879,8 +1551,8 @@ const $ = (s,r)=> (r||document).querySelector(s);
 const $$ = (s,r)=> Array.from((r||document).querySelectorAll(s));
 const app = $("#app");
 const yen = n => "¥"+n.toLocaleString("en-US");
-const TIME_LABEL = {morning:"Morning ☀️",day:"Daytime 🌤️",evening:"Evening 🌆",late:"Late night 🌙"};
-const SEASON_LABEL = {spring:"Spring 🌸",summer:"Summer 🎐",autumn:"Autumn 🍁",winter:"Winter ❄️"};
+const TIME_LABEL = {morning:"Morning",day:"Daytime",evening:"Evening",late:"Late night"};
+const SEASON_LABEL = {spring:"Spring",summer:"Summer",autumn:"Autumn",winter:"Winter"};
 const TIME_EMOJI = {morning:"☀️",day:"🌤️",evening:"🌆",late:"🌙"};
 const SEASON_EMOJI = {spring:"🌸",summer:"🎐",autumn:"🍁",winter:"❄️"};
 
@@ -888,16 +1560,25 @@ function setTod(){
   const b=document.body;
   b.classList.remove("tod-morning","tod-day","tod-evening","tod-late");
   b.classList.add("tod-"+session.time);
+  if(typeof W!=="undefined") W.tod = session.time;
 }
-function toast(msg){
-  const t=$("#toast"); t.textContent=msg; t.classList.add("on");
+function toast(msg, iconHTML){
+  const t=$("#toast");
+  if(iconHTML){
+    t.innerHTML = `<span class="toast-ic"></span>`;
+    t.querySelector(".toast-ic").innerHTML = iconHTML;   // trusted pxIcon svg
+    t.append(document.createTextNode(" "+msg));          // message stays text (safe)
+  } else {
+    t.textContent = msg;
+  }
+  t.classList.add("on");
   clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("on"),2200);
 }
 function cartCount(){ return Object.values(session.cart).reduce((a,b)=>a+b,0); }
 function cartSubtotal(){ return Object.entries(session.cart).reduce((a,[id,q])=>{const it=itemById(id);return a+(it?it.price*q:0);},0); }
 
 /* ----------------------------------------------------------- screen router */
-function render(html){ app.innerHTML = `<div class="screen">${html}</div>`; app.scrollTop = 0; document.body.classList.remove("in-store"); }
+function render(html){ app.innerHTML = `<div class="screen">${html}</div>`; app.scrollTop = 0; document.body.classList.remove("in-store"); if(typeof W!=="undefined") W.active=false; }
 
 /* =========================================================== TITLE */
 function seasonParticles(season){
@@ -1027,262 +1708,1053 @@ function showSplash(){
       <h1 class="jp splash-title">ヨリミチ</h1>
       <p class="splash-sub">A quiet konbini you can visit any time you miss it.</p>
       <div class="splash-cta">Tap anywhere to enter →</div>
-      <div class="splash-hint">best with the sound on 🔊</div>
-      <a class="mode-switch" href="rpg/" onclick="event.stopPropagation()">🎮 Try the walkable RPG version →</a>
+      <div class="splash-hint">best with the sound on ${pxIcon("soundOn",14)}</div>
+      <a class="mode-switch" href="../" onclick="event.stopPropagation()">▸ Classic version</a>
     </div>
   </div>`);
   const enter=()=>{
     document.body.classList.remove("splash-mode");
     Sound.resume(); Sound.startAmbient("title"); Sound.chime();
-    showTitle();
+    showJourneyChoice();
     setTimeout(maybeShowA2HS, 1400);
   };
   $("#splash").addEventListener("click", enter, {once:true});
 }
 
-function showTitle(){
-  inStoreView = false;
-  if(session.paid) newSession();   // a completed visit is over — clear the paid cart
-  setTod();
-  bgmAllowed = true; bgmKind = "title";
-  render(`
-  <div class="title wrap">
-    <div class="brandline"><span class="brandmark">YORIMICHI 24h</span></div>
-    <div id="titleArt">${storefrontSVG(session.time, session.season)}</div>
-    <h1 class="jp" style="font-size:34px;">ヨリミチ</h1>
-    <div class="title-tag">A quiet konbini you can visit any time you miss it. Walk over, take your time, tap your card, eat something good.</div>
-    <div class="title-controls">
-      <div class="eyebrow">What's it like out?</div>
-      <div class="chooser" id="todPick">
-        ${["morning","day","evening","late"].map(t=>`<button class="chip" data-tod="${t}" aria-pressed="${session.time===t}">${TIME_LABEL[t]}</button>`).join("")}
-      </div>
-      <div class="chooser" id="seaPick">
-        ${["spring","summer","autumn","winter"].map(s=>`<button class="chip" data-sea="${s}" aria-pressed="${session.season===s}">${SEASON_LABEL[s]}</button>`).join("")}
-      </div>
-    </div>
-    <div class="cta-row" style="margin-top:6px">
-      <button class="cta" id="goBtn">Head over →</button>
-      ${G.visits>0?`<button class="cta ghost small" id="passBtn2">📖 Passport (${Object.keys(G.journal).length})</button>`:""}
-    </div>
-    <div class="fineprint">A fictional konbini. Free &amp; open — host it yourself.${G.visits>0?` · You've visited ${G.visits} time${G.visits>1?"s":""}.`:""}</div>
-  </div>`);
-  Sound.startAmbient("title");
-
-  const refreshTitleScene=()=>{
-    setTod();
-    const a=$("#titleArt"); if(a) a.innerHTML = storefrontSVG(session.time, session.season);
-    $$("#todPick [data-tod]").forEach(x=>x.setAttribute("aria-pressed", x.dataset.tod===session.time));
-    $$("#seaPick [data-sea]").forEach(x=>x.setAttribute("aria-pressed", x.dataset.sea===session.season));
-  };
-  $("#todPick").addEventListener("click",e=>{const b=e.target.closest("[data-tod]");if(!b)return;
-    Sound.resume();Sound.startAmbient("title");Sound.tick();session.time=b.dataset.tod;refreshTitleScene();});
-  $("#seaPick").addEventListener("click",e=>{const b=e.target.closest("[data-sea]");if(!b)return;
-    Sound.resume();Sound.startAmbient("title");Sound.tick();session.season=b.dataset.sea;refreshTitleScene();});
-  $("#goBtn").addEventListener("click",()=>{Sound.resume();Sound.startAmbient("title");Sound.tick();showJourney();});
-  if($("#passBtn2")) $("#passBtn2").addEventListener("click",()=>{Sound.tick();showPassport();});
-}
-
-/* =========================================================== JOURNEY */
-function journeySVG(time, mode){
-  const night = time==="late"||time==="evening";
-  const sky = time==="morning"?"#FBE6C9":time==="day"?"#CDEAF1":time==="evening"?"#E8A06A":"#10162C";
-  if(mode==="walk"){
-    return `<svg viewBox="0 0 560 220" xmlns="http://www.w3.org/2000/svg">
-      <rect width="560" height="220" fill="${sky}"/>
-      ${night?'<circle cx="480" cy="40" r="20" fill="#F6F0D8"/>':''}
-      <rect y="150" width="560" height="70" fill="${night?'#1b2138':'#c9c8bd'}"/>
-      <!-- street lamp -->
-      <rect x="80" y="70" width="6" height="90" fill="#444"/>
-      <circle cx="83" cy="66" r="10" fill="${night?'#FFE9A8':'#cfd3c8'}"/>
-      ${night?'<polygon points="83,66 50,150 116,150" fill="#FFF1C9" opacity="0.22"/>':''}
-      <!-- vending machine -->
-      <rect x="180" y="86" width="60" height="74" fill="#E8334F" stroke="#1F2421" stroke-width="3"/>
-      <rect x="188" y="94" width="44" height="30" fill="#fff"/>
-      <circle cx="198" cy="138" r="5" fill="#5BB7E0"/><circle cx="214" cy="138" r="5" fill="#FFCB45"/><circle cx="230" cy="138" r="5" fill="#7bbf5a"/>
-      <!-- konbini glow in distance -->
-      <rect x="400" y="92" width="120" height="68" fill="${night?'#FFF6D8':'#eafaf3'}" stroke="#1F2421" stroke-width="3"/>
-      <rect x="400" y="92" width="120" height="14" fill="#0E9E6E"/>
-      <text x="460" y="103" text-anchor="middle" font-family="Zen Maru Gothic" font-weight="900" font-size="11" fill="#fff">ヨリミチ</text>
-    </svg>`;
-  }
-  // subway platform — reflects time of day (above-ground station)
-  return `<svg viewBox="0 0 560 220" xmlns="http://www.w3.org/2000/svg">
-    <rect width="560" height="220" fill="${sky}"/>
-    ${night?'<circle cx="480" cy="40" r="20" fill="#F6F0D8"/>':''}
-    <!-- distant buildings -->
-    <g opacity="${night?0.85:0.4}">
-      ${Array.from({length:9}).map((_,i)=>`<rect x="${i*64}" y="${96-(i%3)*14}" width="48" height="${64+(i%3)*14}" fill="${night?'#222a40':'#b8c2c4'}"/>`).join("")}
-    </g>
-    <!-- platform -->
-    <rect y="150" width="560" height="70" fill="${night?'#2a2f3d':'#c9c8bd'}"/>
-    <rect y="146" width="560" height="6" fill="#FFCB45"/>
-    <!-- train -->
-    <rect x="40" y="60" width="480" height="90" rx="10" fill="${night?'#cdd2d6':'#dfe3e6'}" stroke="#1F2421" stroke-width="3"/>
-    <rect x="40" y="60" width="480" height="12" fill="#0E9E6E"/>
-    <rect x="70" y="86" width="60" height="44" rx="4" fill="${night?'#FFE9A8':'#9fd0e6'}" stroke="#1F2421" stroke-width="2"/>
-    <rect x="160" y="86" width="60" height="44" rx="4" fill="${night?'#FFE9A8':'#9fd0e6'}" stroke="#1F2421" stroke-width="2"/>
-    <rect x="250" y="84" width="50" height="60" fill="#cfd6da" stroke="#1F2421" stroke-width="2"/>
-    <rect x="340" y="86" width="60" height="44" rx="4" fill="${night?'#FFE9A8':'#9fd0e6'}" stroke="#1F2421" stroke-width="2"/>
-    <rect x="430" y="86" width="60" height="44" rx="4" fill="${night?'#FFE9A8':'#9fd0e6'}" stroke="#1F2421" stroke-width="2"/>
-    <!-- sign -->
-    <rect x="220" y="20" width="120" height="26" rx="4" fill="#fff" stroke="#1F2421" stroke-width="2"/>
-    <text x="280" y="38" text-anchor="middle" font-family="Zen Maru Gothic" font-weight="700" font-size="13" fill="#1F2421">ヨリミチ前駅</text>
-  </svg>`;
-}
-
-function showJourney(){
-  inStoreView = false;
-    setTod();
-  bgmAllowed = true; bgmKind = "title";
-  Sound.startAmbient("title");
-  render(`
-  <div class="journey wrap">
-    <button class="backbtn" id="back">‹ Back</button>
-    <div class="eyebrow">On the way</div>
-    <h2 class="jp">How are you getting there?</h2>
-    <p class="narr">It's ${TIME_LABEL[session.time].toLowerCase().replace(/[^a-z ]/g,'').trim()} and ${SEASON_LABEL[session.season].toLowerCase().replace(/[^a-z ]/g,'').trim()}. The konbini's not far.</p>
-    <div class="pathcards">
-      <button class="pathcard" data-mode="walk">
-        <div class="big">🚶</div><h3>Walk over</h3>
-        <p>Five minutes down the street, past the vending machines and the quiet houses.</p>
-      </button>
-      <button class="pathcard" data-mode="subway">
-        <div class="big">🚃</div><h3>Take the train</h3>
-        <p>One stop on the line. Mind the departure melody — it's stuck in your head already.</p>
-      </button>
-    </div>
-  </div>`);
-  $("#back").addEventListener("click",()=>{Sound.tick();showTitle();});
-  $$(".pathcard").forEach(c=>c.addEventListener("click",()=>{
-    Sound.resume(); transit(c.dataset.mode);
-  }));
-}
-
-function transit(mode){
-  inStoreView = false;
-    Sound.tick();
-  render(`
-  <div class="journey wrap">
-    <button class="backbtn" id="back">‹ Change how I get there</button>
-    <div class="scene">${journeySVG(session.time,mode==="walk"?"walk":"subway")}</div>
-    <h2 class="jp">${mode==="walk"?"Walking…":"Riding one stop…"}</h2>
-    <p class="narr" id="tnarr">${mode==="walk"?"Streetlights, a cat, the hum of a vending machine.":"The doors chime shut. The melody plays. You watch the dark glass."}</p>
-    <div class="vend" id="vend">
-      ${mode==="walk"?`<button class="cta ghost small" data-vendbuy="drk_boss">Grab a ${130} canned coffee from the machine</button>`:""}
-    </div>
-    <button class="cta" id="arrive">Arrive at the konbini →</button>
-  </div>`);
-  $("#back").addEventListener("click",()=>{Sound.tick();showJourney();});
-  if(mode==="subway") setTimeout(()=>Sound.depart(),250);
-  if($("[data-vendbuy]")){
-    $("[data-vendbuy]").addEventListener("click",e=>{
-      const id=e.currentTarget.dataset.vendbuy; const it=itemById(id);
-      session.cart[id]=(session.cart[id]||0)+1; Sound.coin();
-      e.currentTarget.outerHTML=`<span class="cta ghost small" style="opacity:.6">Got the ${it.ro} — it's in your basket 🥫</span>`;
-    });
-  }
-  $("#arrive").addEventListener("click",()=>{ enterStore(); });
-}
-
-/* =========================================================== STORE */
+/* =========================================================== RPG ENGINE */
+let inStoreView = false;   // legacy flag some existing screens still write to; harmless
 function pickRecommend(){
   const pool = availableItems().filter(i=>!session.cart[i.id]);
   session.recommend = pool[Math.floor(Math.random()*pool.length)];
 }
-function enterStore(){
-  Sound.resume(); Sound.chime();
-  bgmAllowed = true; bgmKind = "store";
-  setTimeout(()=>Sound.startAmbient("store"), 400);
-  session.arrived = true;
-  pickRecommend();
-  showStore("all");
-  toast("いらっしゃいませ！ — Welcome in.");
+const TILE = 16;
+const stage = $("#stage");
+const sctx = stage.getContext("2d");
+sctx.imageSmoothingEnabled = false;
+const whud = $("#whud");
+const joyBase = $("#joyBase"), joyKnob = $("#joyKnob"), actBtn = $("#actBtn"), fieldPrompt = $("#fieldPrompt"), dialogBox = $("#dialogBox");
+
+function shade(hex, amt){
+  const n = parseInt(hex.slice(1),16);
+  let r=(n>>16)+amt, g=((n>>8)&255)+amt, b=(n&255)+amt;
+  r=Math.max(0,Math.min(255,r)); g=Math.max(0,Math.min(255,g)); b=Math.max(0,Math.min(255,b));
+  return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
 }
 
-let currentSection = "all";
-let aisleScrollLeft = 0;
-let inStoreView = false;     // true only while the shelves view is showing
-function showStore(sec){
-  currentSection = sec || currentSection;
-  inStoreView = true;
-  setTod();
-  const items = availableItems().filter(i=> currentSection==="all" ? true : i.sec===currentSection);
+/* ---------------------------------------------------------- tile drawers */
+/* ---------------------------------------------------------- SNES pixel art */
+const ART_PAL = {
+  ' ':null,
+  'o':'#20241c','e':'#1f2421','.':'rgba(0,0,0,0.16)',
+  's':'#ffe0c2','S':'#e8c4a4','k':'#3a2a1f','K':'#4e3a2c',
+  'g':'#0E9E6E','G':'#0b7854','h':'#56c896','q':'#0a5c44',
+  'p':'#3a4a63','P':'#2a364a','b':'#5a6e8c',
+  'w':'#a9895f','W':'#8a6f4c','x':'#6b5537','v':'#c2a273',
+  'm':'#96a0a4','M':'#6e787c','n':'#c6d0d2','X':'#3a444a',
+  'c':'#96d0e2','C':'#78bad0','l':'#e0f4fa','u':'#5BB7E0',
+  'f':'#F4F3EC','F':'#eae8dc','d':'#e4e3da',
+  'z':'#cfc9b4','Z':'#bdb69f','y':'#d8d2bd',
+  'a':'#e8ddc4','A':'#d9cbaa',
+  'i':'#ffffff','I':'#d7e3e0',
+  'r':'#E8505A','t':'#78c878','Y':'#f0c85a','B':'#5BB7E0','R':'#c0392b',
+  'D':'#1F2421','N':'#13182b','j':'#f2b25c',
+  '1':'#ffffff','2':'#f0855b','3':'#e8622a',
+};
+const TOD_TINT = { morning:[1.02,0.96,0.86], day:[1,1,1], evening:[1.06,0.86,0.75], late:[0.62,0.68,0.86] };
+function _mul(col,t){
+  if(col.startsWith('rgba')) return col;
+  const n=parseInt(col.slice(1),16); let r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+  r=Math.min(255,Math.round(r*t[0])); g=Math.min(255,Math.round(g*t[1])); b=Math.min(255,Math.round(b*t[2]));
+  return `rgb(${r},${g},${b})`;
+}
+const _artCache = new Map();
+function bakeArt(grid, key, tod, palOverride){
+  const ck=key+"|"+tod+(palOverride?"|"+key:"");
+  if(_artCache.has(ck)) return _artCache.get(ck);
+  const h=grid.length,w=grid[0].length;
+  const cv=document.createElement("canvas"); cv.width=w; cv.height=h;
+  const c=cv.getContext("2d"); c.imageSmoothingEnabled=false;
+  const t=TOD_TINT[tod]||TOD_TINT.day;
+  const pal=palOverride?Object.assign({},ART_PAL,palOverride):ART_PAL;
+  for(let y=0;y<h;y++){const row=grid[y];for(let x=0;x<w;x++){
+    const chr=row[x]; if(chr===' '||chr===undefined) continue;
+    const col=pal[chr]; if(!col) continue; c.fillStyle=_mul(col,t); c.fillRect(x,y,1,1);
+  }}
+  _artCache.set(ck,cv); return cv;
+}
+function blit(ctx,grid,key,tod,ox,oy,palOverride){
+  const cv=bakeArt(grid,key,tod,palOverride);
+  ctx.drawImage(cv, ox, oy-(cv.height-TILE));
+}
+
+/* ============================ TILE GRIDS (all 16 wide) ============================ */
+const G_FLOOR = [
+  "ffffffffffffffff","fFfffffffffffFff","ffffffffffffffff","ffffffFfffffffff",
+  "ffffffffffffffff","ffffffffffffFfff","ffffffffffffffff","fffFffffffffffff",
+  "ffffffffffffffff","ffffffffFfffffff","ffffffffffffffff","ffFfffffffffffFf",
+  "ffffffffffffffff","ffffffffffffffff","ffffffFfffffffff","dddddddddddddddd",
+];
+const G_FLOOR_B = [
+  "FFFFFFFFFFFFFFFF","FfFFFFFFFFFFFfFF","FFFFFFFFFFFFFFFF","FFFFFFfFFFFFFFFF",
+  "FFFFFFFFFFFFFFFF","FFFFFFFFFFFFFfFF","FFFFFFFFFFFFFFFF","FFFfFFFFFFFFFFFF",
+  "FFFFFFFFFFFFFFFF","FFFFFFFFfFFFFFFF","FFFFFFFFFFFFFFFF","FFfFFFFFFFFFFFfF",
+  "FFFFFFFFFFFFFFFF","FFFFFFFFFFFFFFFF","FFFFFFfFFFFFFFFF","dddddddddddddddd",
+];
+const G_WALL = [
+  "aaaaaaaaaaaaaaaa","aAaaaaaaaaaaaaAa","aaaaaaaaaaaaaaaa","AAAAAAAAAAAAAAAA",
+  "dddddddddddddddd","aaaaaaaaaaaaaaaa","aAaaaaaaaaaaaaaa","aaaaaaaaaaaaaaaa",
+  "aaaaaaaaaaaaaaaa","AAAAAAAAAAAAAAAA","dddddddddddddddd","aaaaaaaaaaaaaaaa",
+  "aaaaaaaaaaaaaaaa","aAaaaaaaaaaaaaaa","gggggggggggggggg","qqqqqqqqqqqqqqqq",
+];
+const G_WINDOWWALL = [
+  "aaaaaaaaaaaaaaaa","aAaaaaaaaaaaaaAa","aaaaaaaaaaaaaaaa","gggggggggggggggg",
+  "mccccccccccccccm","mclccccccccccccm","mcclcccccccccccm","mccccccccccccccm",
+  "mccccccccccccccm","mMMMMMMMMMMMMMMm","aaaaaaaaaaaaaaaa","aAaaaaaaaaaaaaaa",
+  "aaaaaaaaaaaaaaaa","AAAAAAAAAAAAAAAA","gggggggggggggggg","qqqqqqqqqqqqqqqq",
+];
+const G_SHELF = [
+  "wwwwwwwwwwwwwwww",
+  "wvvvvvvvvvvvvvvW",
+  "wv112233112233vW",
+  "wv112233112233vW",
+  "wWWWWWWWWWWWWWWW",
+  "wv112233112233vW",
+  "wv112233112233vW",
+  "wWWWWWWWWWWWWWWW",
+  "wv223311223311vW",
+  "wv223311223311vW",
+  "wWWWWWWWWWWWWWWW",
+  "wv331122331122vW",
+  "wv331122331122vW",
+  "wxxxxxxxxxxxxxxW",
+  "WWWWWWWWWWWWWWWW",
+  "oooooooooooooooo",
+];
+const G_FRIDGE = [
+  "mmmmmmmmmmmmmmmm",
+  "mnnnnnnnnnnnnnnm",
+  "mnCCCCCCCCCCCCnm",
+  "mnc11c22c33c1cnm",
+  "mnl11c22c33c1cnm",
+  "mnMMMMMMMMMMMMnm",
+  "mnc22c33c11c2cnm",
+  "mnl22c33c11c2cnm",
+  "mnMMMMMMMMMMMMnm",
+  "mnc33c11c22c3cnm",
+  "mnc33c11c22c3cnm",
+  "mnCCCCCCCCCCCCnm",
+  "mnMMMMMMMMMMMMnm",
+  "mMMMMMMMMMMMMMMm",
+  "mMMMMMMMMMMMMMMm",
+  "oooooooooooooooo",
+];
+const G_REGISTER = [
+  "                ","                ","                ","      mmmmm     ",
+  "     mnnnnnm    ","     mnDjDnm    ","     mnnnnnm    ","     mMMMMMm    ",
+  "  wwwwwwwwwwwww ","  wvvvvvvvvvvvw ","  wvvvvvvvvvvvw ","  wWWWWWWWWWWWw ",
+  "  wWWWWWWWWWWWw ","  wxxxxxxxxxxxw ","  wxxxxxxxxxxxw ","  wwwwwwwwwwwww ",
+];
+const G_CLERK = [
+  "                ","     kkkkkk     ","    kKKKKKKk    ","    ksssssssk   ",
+  "    ksesssesk   ","    kssssssssk  ","     ssoossss   ","    ghqggggqhw  ",
+  "   ghhggggggqW  ","  wwwwwwwwwwwww ","  wvvvvvvvvvvvw ","  wvvvvvvvvvvvw ",
+  "  wWWWWWWWWWWWw ","  wxxxxxxxxxxxw ","  wxxxxxxxxxxxw ","  wwwwwwwwwwwww ",
+];
+const G_COUNTER = [
+  "                ","                ","                ","                ",
+  "                ","                ","                ","                ",
+  "                ","  wwwwwwwwwwwww ","  wvvvvvvvvvvvw ","  wvvvvvvvvvvvw ",
+  "  wWWWWWWWWWWWw ","  wxxxxxxxxxxxw ","  wxxxxxxxxxxxw ","  wwwwwwwwwwwww ",
+];
+const G_STOREDOOR = [
+  "mmmmmmmmmmmmmmmm",
+  "mggggggggggggggm",
+  "mqiiiiiiiiiiiiqm",
+  "mqllcccc cccclqm",
+  "mqllcccc cccclqm",
+  "mqcccccc cccccqm",
+  "mqcccccc cccccqm",
+  "mqcccccc cccccqm",
+  "mqcccccc cccccqm",
+  "mqcccccc cccccqm",
+  "mqcccccc cccccqm",
+  "mqcccccc cccccqm",
+  "mqiiiiii iiiiiqm",
+  "mMMMMMMM MMMMMMm",
+  "ffffffffffffffff",
+  "dddddddddddddddd",
+];
+const G_SIDEWALK = [
+  "zzzzzzzzzzzzzzzz","zzzzzzzzzzzzzzzz","zzzzzzzzZzzzzzzz","zzzzzzzzzzzzzzzz",
+  "yyyyyyyyyyyyyyyy","zzzzzzzzzzzzzzzz","zzzZzzzzzzzzzzzz","zzzzzzzzzzzzzzzz",
+  "yyyyyyyyyyyyyyyy","zzzzzzzzzzzzzzzz","zzzzzzzzzzzZzzzz","zzzzzzzzzzzzzzzz",
+  "zzzzzzzzzzzzzzzz","zzzZzzzzzzzzzzzz","zzzzzzzzzzzzzzzz","yyyyyyyyyyyyyyyy",
+];
+const G_BUILDING = [
+  "aaaaaaaaaaaaaaaa","aAAAAAAAAAAAAAAa","aAaaaaaaaaaaaaAa","aAaAAAAAAAAAAaAa",
+  "aAaAIIIIIIIIAaAa","aAaAIccccccIAaAa","aAaAIccccccIAaAa","aAaAIIIIIIIIAaAa",
+  "aAaaaaaaaaaaaaAa","aAAAAAAAAAAAAAAa","aAaaaaaaaaaaaaAa","aAaAAAAAAAAAAaAa",
+  "aAaAIccccccIAaAa","aAaAIccccccIAaAa","gggggggggggggggg","qqqqqqqqqqqqqqqq",
+];
+const G_STREETDOOR = [
+  "aaaaaaaaaaaaaaaa","aAAAAAAAAAAAAAAa","aqqqqqqqqqqqqqqa","aqggggggggggggqa",
+  "aqgllccccccclgqa","aqgllccccccclgqa","aqgccccccccccgqa","aqgccccccccccgqa",
+  "aqgccccccccccgqa","aqgccccccccccgqa","aqgccccccccccgqa","aqgccccccccccgqa",
+  "aqgcccccjcccgqqa","aqgccccccccccgqa","aqqqqqqqqqqqqqqa","zzzzzzzzzzzzzzzz",
+];
+const G_VENDING = [
+  "                ","  RRRRRRRRRRRR  ","  RiiiiiiiiiiR  ","  RiRRRRRRRRiR  ",
+  "  RiRrrrrrrRiR  ","  RiRrrrrrrRiR  ","  RiRRRRRRRRiR  ","  RiuuBuuBuuiR  ",
+  "  RiuuBuuBuuiR  ","  RiYYtYYtYYiR  ","  RiYYtYYtYYiR  ","  RiRRRRRRRRiR  ",
+  "  RiiDDDDDiiiR  ","  RiiDjjDDiiiR  ","  RRRRRRRRRRRR  ","  zzzzzzzzzzzz  ",
+];
+const G_SIGN = [
+  "    iiiiiiii    ","   iIIIIIIIIi   ","   iIgggggIIi   ","   iIiiiiiIIi   ",
+  "   iIiDDiiIIi   ","   iIiiDDiIIi   ","   iIiiiiiIIi   ","   iIiDDDiIIi   ",
+  "   iIIIIIIIIi   ","   iiiiiiiiii   ","      WWWW      ","      WxxW      ",
+  "      WxxW      ","      WxxW      ","      WxxW      ","   zzzWxxWzzz   ",
+];
+const G_PLATFORM = [
+  "yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy",
+  "yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy",
+  "yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy",
+  "yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy","ZZZZZZZZZZZZZZZZ",
+];
+const G_PLATFORM_EDGE = [
+  "jjjjjjjjjjjjjjjj","XXXXXXXXXXXXXXXX","yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy",
+  "yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy",
+  "yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy",
+  "yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy",
+];
+const G_SUBWALL = [
+  "XXXXXXXXXXXXXXXX","XNNNNNNNNNNNNNNX","XNiiiiiiiiiiiiNX","XNiMMMMMMMMMMiNX",
+  "XNiMMMMMMMMMMiNX","XNiiiiiiiiiiiiNX","XNNNNNNNNNNNNNNX","XXXXXXXXXXXXXXXX",
+  "XNNNNNNNNNNNNNNX","XNiiiiiiiiiiiiNX","XNiMMMMMMMMMMiNX","XNiMMMMMMMMMMiNX",
+  "XNiiiiiiiiiiiiNX","XNNNNNNNNNNNNNNX","XXXXXXXXXXXXXXXX","XXXXXXXXXXXXXXXX",
+];
+const G_STAIRS_UP = [
+  "yyyyyyyyyyyyyyyy","yjjjjjjjjjjjjjjy","yMMMMMMMMMMMMMMy","ynnnnnnnnnnnnnMy",
+  "yMMMMMMMMMMMMMMy","ynnnnnnnnnnnnnMy","yMMMMMMMMMMMMMMy","ynnnnnnnnnnnnnMy",
+  "yMMMMMMMMMMMMMMy","ynnnnnnnnnnnnnMy","yMMMMMMMMMMMMMMy","ynnnnnnnnnnnnnMy",
+  "yMMMMMMMMMMMMMMy","yXXXXXXXXXXXXXXy","yyyyyyyyyyyyyyyy","yyyyyyyyyyyyyyyy",
+];
+const G_TRAINDOOR = [
+  "MMMMMMMMMMMMMMMM",
+  "MnnnnnnnnnnnnnnM",
+  "Mnccccc  cccccnM",
+  "Mnccccc  cccccnM",
+  "Mnccccc  cccccnM",
+  "Mnccccc  cccccnM",
+  "Mnccccc  cccccnM",
+  "Mnccccc  cccccnM",
+  "Mnccccc  cccccnM",
+  "Mnccccc  cccccnM",
+  "Mnccccc  cccccnM",
+  "MnMMMMMMMMMMMMnM",
+  "MMMMMMMMMMMMMMMM",
+  "yyyyyyyyyyyyyyyy",
+  "yyyyyyyyyyyyyyyy",
+  "ZZZZZZZZZZZZZZZZ",
+];
+
+const SHELF_COLORS = {
+  onigiri:{'1':'#ffffff','2':'#f0855b','3':'#e8622a'},
+  sando:{'1':'#fbe08a','2':'#f4d9b8','3':'#e2a23b'},
+  hot:{'1':'#e8622a','2':'#c0392b','3':'#e2a23b'},
+  sweets:{'1':'#d94a6a','2':'#6b3f1d','3':'#f4a6bd'},
+  seasonal:{'1':'#f4a6bd','2':'#e94f6b','3':'#c0392b'},
+};
+
+const PLAYER_ART = {
+  down:[[
+    "                ","     kkkkkk     ","    kKKKKKKk    ","    kssssssk    ",
+    "    kssssssk    ","    ksessesk    ","    kssssssk    ","     ssoossss   ",
+    "    ghhgggghw   ","   ghhgggggg W  ","  s ggggggg sW  ","  s ggggggg s   ",
+    "    pppp pppp   ","    PppP pPpp   ","    PP    PP    ","    oo    oo    ",
+  ],[
+    "                ","     kkkkkk     ","    kKKKKKKk    ","    kssssssk    ",
+    "    kssssssk    ","    ksessesk    ","    kssssssk    ","     ssoossss   ",
+    "    ghhgggghw   ","   ghhgggggg W  ","  s ggggggg sW  ","  s ggggggg s   ",
+    "     ppp ppp    ","     Ppp ppP    ","      P   PP    ","      o   oo    ",
+  ]],
+  up:[[
+    "                ","     kkkkkk     ","    kkkkkkkkk   ","    kkkkkkkkk   ",
+    "    kkkkkkkk k  ","    kkkkkkkkk   ","    kkkkkkkkk   ","     ssoossss   ",
+    "    ghhgggggw   ","   ghhggggg  W  ","  s ggggggg sW  ","  s ggggggg s   ",
+    "    pppp pppp   ","    PppP pPpp   ","    PP    PP    ","    oo    oo    ",
+  ],[
+    "                ","     kkkkkk     ","    kkkkkkkkk   ","    kkkkkkkkk   ",
+    "    kkkkkkkk k  ","    kkkkkkkkk   ","    kkkkkkkkk   ","     ssoossss   ",
+    "    ghhgggggw   ","   ghhggggg  W  ","  s ggggggg sW  ","  s ggggggg s   ",
+    "     ppp ppp    ","     Ppp ppP    ","      P   PP    ","      o   oo    ",
+  ]],
+  right:[[
+    "                ","     kkkkkk     ","    kKKKKKKKk   ","    kssssssKk   ",
+    "    kssssssss   ","    ksssesssS   ","    ksssssssS   ","     ssooss     ",
+    "     ghggggw    ","    ghhgggg W   ","   s hggggg W   ","   s hgggg s    ",
+    "     ppppp      ","     PpppP      ","      PP P      ","      oo o      ",
+  ],[
+    "                ","     kkkkkk     ","    kKKKKKKKk   ","    kssssssKk   ",
+    "    kssssssss   ","    ksssesssS   ","    ksssssssS   ","     ssooss     ",
+    "     ghggggw    ","    ghhgggg W   ","   s hggggg W   ","   s hgggg s    ",
+    "      pppp      ","      Pppp      ","      P  P      ","      o  o      ",
+  ]],
+};
+PLAYER_ART.left = PLAYER_ART.right.map(f=>f.map(r=>r.split("").reverse().join("")));
+
+function drawPlayer(ctx, px, py, dir, frame){
+  ctx.fillStyle="rgba(0,0,0,0.18)"; ctx.fillRect(px+4,py+15,8,2);
+  const frames=PLAYER_ART[dir]||PLAYER_ART.down;
+  const grid=frames[frame%frames.length];
+  blit(ctx, grid, "player_"+dir+"_"+(frame%2), (typeof W!=="undefined"&&W.tod)||"day", px, py);
+}
+
+
+function todNow(){ return (typeof W!=="undefined" && W.tod) || "day"; }
+function drawFloorInterior(ctx,ox,oy,tx,ty){ blit(ctx,(tx+ty)%2===0?G_FLOOR:G_FLOOR_B,"floor"+((tx+ty)%2),todNow(),ox,oy); }
+function drawWallInterior(ctx,ox,oy){ blit(ctx,G_WALL,"wall",todNow(),ox,oy); }
+function drawWindowWall(ctx,ox,oy){ blit(ctx,G_WINDOWWALL,"windowwall",todNow(),ox,oy); }
+function shelfDraw(secId){ return function(ctx,ox,oy){ blit(ctx,G_SHELF,"shelf_"+secId,todNow(),ox,oy,SHELF_COLORS[secId]); }; }
+function drawFridge(ctx,ox,oy){ blit(ctx,G_FRIDGE,"fridge",todNow(),ox,oy); }
+function drawRegister(ctx,ox,oy,tx,ty){ drawFloorInterior(ctx,ox,oy,tx,ty); blit(ctx,G_REGISTER,"register",todNow(),ox,oy); }
+function drawCounter(ctx,ox,oy,tx,ty){ drawFloorInterior(ctx,ox,oy,tx,ty); blit(ctx,G_COUNTER,"counter",todNow(),ox,oy); }
+function drawClerkTile(ctx,ox,oy,tx,ty){ drawFloorInterior(ctx,ox,oy,tx,ty); blit(ctx,G_CLERK,"clerk",todNow(),ox,oy); }
+function drawStoreDoor(ctx,ox,oy){ blit(ctx,G_STOREDOOR,"storedoor",todNow(),ox,oy); }
+function drawSidewalk(ctx,ox,oy){ blit(ctx,G_SIDEWALK,"sidewalk",todNow(),ox,oy); }
+function drawBuildingWall(ctx,ox,oy){ blit(ctx,G_BUILDING,"building",todNow(),ox,oy); }
+function drawStreetDoor(ctx,ox,oy){ blit(ctx,G_STREETDOOR,"streetdoor",todNow(),ox,oy); }
+function drawVending(ctx,ox,oy){ blit(ctx,G_VENDING,"vending",todNow(),ox,oy); }
+function drawSignboard(ctx,ox,oy){ blit(ctx,G_SIGN,"sign",todNow(),ox,oy); }
+function drawStairs(ctx,ox,oy){ blit(ctx,G_STAIRS_UP,"stairs",todNow(),ox,oy); }
+function drawPlatform(ctx,ox,oy){ blit(ctx,G_PLATFORM,"platform",todNow(),ox,oy); }
+function drawPlatformEdge(ctx,ox,oy){ blit(ctx,G_PLATFORM_EDGE,"platformE",todNow(),ox,oy); }
+function drawSubwayWall(ctx,ox,oy){ blit(ctx,G_SUBWALL,"subwall",todNow(),ox,oy); }
+function drawStairsUp(ctx,ox,oy){ blit(ctx,G_STAIRS_UP,"stairsup",todNow(),ox,oy); }
+function drawTrainDoor(ctx,ox,oy){ blit(ctx,G_TRAINDOOR,"traindoor",todNow(),ox,oy); }
+
+/* ---------------------------------------------------------- maps */
+const SECTION_COLORS = {
+  onigiri:"#F0855B", sando:"#FBE08A", hot:"#E8622A", drinks:"#5BB7E0",
+  sweets:"#D94A6A", ice:"#9bd6ea", seasonal:"#F4A6BD"
+};
+const STORE_ROWS = [
+  "###############",
+  "#WWWW.....WWWW#",
+  "#.............#",
+  "#AA.BB.CC.DD..#",
+  "#AA.BB.CC.DD..#",
+  "#.............#",
+  "#.............#",
+  "#EE.FF.GG.....#",
+  "#EE.FF.GG.....#",
+  "#.............#",
+  "#.............#",
+  "#.............#",
+  "#....KcR......#",
+  "#....ccc......#",
+  "#.............#",
+  "#.............#",
+  "######ddd######",
+];
+const STORE_LEGEND = {
+  "#":{solid:true, draw:drawWallInterior},
+  ".":{solid:false, draw:drawFloorInterior},
+  "W":{solid:true, draw:drawWindowWall},
+  "A":{solid:true, draw:shelfDraw("onigiri"), interact:()=>openShelfDialog("onigiri","\uD83C\uDF59"), label:"onigiri & rice"},
+  "B":{solid:true, draw:shelfDraw("sando"), interact:()=>openShelfDialog("sando","\uD83E\uDD6A"), label:"sandwiches"},
+  "C":{solid:true, draw:shelfDraw("hot"), interact:()=>openShelfDialog("hot","\uD83C\uDF57"), label:"hot foods"},
+  "D":{solid:true, draw:drawFridge, interact:()=>openShelfDialog("drinks","\uD83E\uDD64"), label:"drinks"},
+  "E":{solid:true, draw:shelfDraw("sweets"), interact:()=>openShelfDialog("sweets","\uD83C\uDF6B"), label:"snacks & sweets"},
+  "F":{solid:true, draw:drawFridge, interact:()=>openShelfDialog("ice","\uD83C\uDF68"), label:"ice cream"},
+  "G":{solid:true, draw:shelfDraw("seasonal"), interact:()=>openShelfDialog("seasonal","\uD83C\uDF38"), label:"seasonal"},
+  "K":{solid:true, draw:drawClerkTile, interact:()=>openClerkDialog(), label:"talk to the clerk"},
+  "c":{solid:true, draw:drawCounter, interact:()=>tryGoRegister(), label:"check out"},
+  "R":{solid:true, draw:drawRegister, interact:()=>tryGoRegister(), label:"check out"},
+  "d":{solid:false, draw:drawStoreDoor, auto:()=>leaveStoreToStreet()},
+};
+const STORE_MAP = {id:"store", rows:STORE_ROWS, legend:STORE_LEGEND, viewW:11, viewH:13, spawn:{x:7,y:15,dir:"up"}};
+
+const STREET_ROWS = [
+  "###########",
+  "#BBBBdBBBB#",
+  "#.........#",
+  "#.........#",
+  "#....G....#",
+  "#.........#",
+  "#.........#",
+  "#..V......#",
+  "#.........#",
+  "#.........#",
+  "#.........#",
+  "#.......T.#",
+  "#.........#",
+  "#.........#",
+  "#.........#",
+  "#.........#",
+  "#.........#",
+  "###########",
+];
+const STREET_LEGEND = {
+  "#":{solid:true, draw:drawBuildingWall},
+  ".":{solid:false, draw:drawSidewalk},
+  "B":{solid:true, draw:drawBuildingWall},
+  "d":{solid:false, draw:drawStreetDoor, auto:()=>enterStore()},
+  "G":{solid:true, draw:drawSignboard, interact:()=>openSignboard(), label:"check the board"},
+  "V":{solid:true, draw:drawVending, interact:()=>openVending(), label:"use the machine"},
+  "T":{solid:false, draw:drawStairs, auto:()=>enterSubwayFromStreet()},
+};
+const STREET_MAP = {id:"street", rows:STREET_ROWS, legend:STREET_LEGEND, viewW:9, viewH:13, spawn:{x:5,y:16,dir:"up"}};
+
+// Subway platform — walk up to the train door and board (triggers the ride)
+const SUBWAY_ROWS = [
+  "###########",
+  "#TTTTTTTTT#",
+  "#eeeeeeeee#",
+  "#.........#",
+  "#.........#",
+  "#.........#",
+  "L.........#",
+  "#.........#",
+  "#.........#",
+  "#.........#",
+  "###########",
+];
+const SUBWAY_LEGEND = {
+  "#":{solid:true, draw:drawSubwayWall},
+  ".":{solid:false, draw:drawPlatform},
+  "e":{solid:false, draw:drawPlatformEdge},
+  "T":{solid:true, draw:drawTrainDoor, interact:()=>boardTrain(), label:"board the train"},
+  "L":{solid:false, draw:drawStairsUp, auto:()=>leaveSubwayToStreet()},
+};
+const SUBWAY_MAP = {id:"subway", rows:SUBWAY_ROWS, legend:SUBWAY_LEGEND, viewW:9, viewH:9, spawn:{x:5,y:8,dir:"up"}};
+
+/* ---------------------------------------------------------- engine state */
+const DIRV = {up:[0,-1], down:[0,1], left:[-1,0], right:[1,0]};
+const MOVE_MS = 150;
+const W = {
+  map:null, cam:{x:0,y:0}, active:false, raf:null, heldDir:null, facing:null, tod:"day", path:null,
+  player:{tx:0,ty:0,fx:0,fy:0,dir:"down",moving:false,moveT:0,fromX:0,fromY:0,toX:0,toY:0,frame:0},
+};
+let lastFrameTime = 0;
+const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints>0);
+
+function tileChar(map,x,y){
+  if(y<0||y>=map.rows.length) return "#";
+  const row = map.rows[y];
+  if(x<0||x>=row.length) return "#";
+  return row[x];
+}
+function tileDef(map,x,y){
+  return (map.legend[tileChar(map,x,y)]) || {solid:true};
+}
+function isWalkable(x,y){ return !tileDef(W.map,x,y).solid; }
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+
+function fieldInputAllowed(){
+  if(!W.active || !W.map) return false;
+  if(app.children.length>0) return false;
+  if($("#modal").classList.contains("on")) return false;
+  if($("#drawer").classList.contains("on")) return false;
+  if($("#passportOverlay").classList.contains("on")) return false;
+  if(dialogBox.classList.contains("on")) return false;
+  return true;
+}
+
+function resizeStage(){
+  if(!W.map) return;
+  const inStore = document.body.classList.contains("rpg-in-store");
+  const huH = inStore ? (whud.offsetHeight || 54) : 0;
+  stage.width = W.map.viewW*TILE;
+  stage.height = W.map.viewH*TILE;
+  const availW = window.innerWidth;
+  const availH = Math.max(80, window.innerHeight - huH);
+  const fitW = availW/stage.width, fitH = availH/stage.height;
+  // portrait phone screens: fill (cover) so the world fills the tall screen.
+  // wide / desktop screens: fit (contain) so you can see the whole scene, never over-zoomed.
+  const portraitish = availW <= availH * 1.15;   // roughly taller-than-wide
+  let scale = portraitish ? Math.max(fitW, fitH) : Math.min(fitW, fitH);
+  // hard cap so a big monitor doesn't blow the tiles up to enormous size
+  const MAX_SCALE = 6;
+  scale = Math.min(scale, MAX_SCALE);
+  if(!isFinite(scale) || scale<=0) scale = 1;
+  const cssW = stage.width*scale, cssH = stage.height*scale;
+  stage.style.width = cssW+"px";
+  stage.style.height = cssH+"px";
+  stage.style.left = "50%";
+  stage.style.transform = "translateX(-50%)";
+  stage.style.top = (huH + (availH-cssH)/2)+"px";
+  sctx.imageSmoothingEnabled = false;
+}
+window.addEventListener("resize", ()=>{ if(W.map) resizeStage(); });
+window.addEventListener("orientationchange", ()=>{ if(W.map) setTimeout(resizeStage,60); });
+
+function enterScene(map, spawnOverride){
+  app.innerHTML = "";
+  W.map = map;
+  const sp = spawnOverride || map.spawn;
+  W.player.tx=sp.x; W.player.ty=sp.y; W.player.fx=sp.x; W.player.fy=sp.y;
+  W.player.dir=sp.dir; W.player.moving=false; W.player.frame=0;
+  W.heldDir=null; W.facing=null; W.path=null;
+  hideFieldPrompt(); actBtn.classList.add("hidden");
+  document.body.classList.add("rpg-active");
+  document.body.classList.toggle("rpg-in-store", map.id==="store");
+  document.body.classList.toggle("in-store", map.id==="store");
+  W.active = true;
+  resizeStage();
+  lastFrameTime = performance.now();
+  cancelAnimationFrame(W.raf);
+  W.raf = requestAnimationFrame(loop);
+}
+function resumeFieldEngine(){
+  app.innerHTML = "";
+  W.active = true;
+  resizeStage();
+  lastFrameTime = performance.now();
+  cancelAnimationFrame(W.raf);
+  W.raf = requestAnimationFrame(loop);
+}
+
+function checkAutoTile(){
+  const def = tileDef(W.map, W.player.tx, W.player.ty);
+  if(def.auto) def.auto();
+}
+function updateMovement(dt){
+  const p = W.player;
+  if(p.moving){
+    p.moveT += dt;
+    const t = Math.min(1, p.moveT/MOVE_MS);
+    p.fx = p.fromX + (p.toX-p.fromX)*t;
+    p.fy = p.fromY + (p.toY-p.fromY)*t;
+    if(t>=1){
+      p.moving=false; p.tx=p.toX; p.ty=p.toY; p.fx=p.tx; p.fy=p.ty;
+      p.frame = p.frame===0?1:0;
+      checkAutoTile();
+    }
+    return;
+  }
+  // manual joystick/keyboard input cancels any queued tap-path and takes over
+  if(fieldInputAllowed() && W.heldDir){
+    W.path=null;
+    p.dir = W.heldDir;
+    const [dx,dy] = DIRV[p.dir];
+    const nx=p.tx+dx, ny=p.ty+dy;
+    if(isWalkable(nx,ny)){
+      p.moving=true; p.moveT=0;
+      p.fromX=p.tx; p.fromY=p.ty; p.toX=nx; p.toY=ny;
+    }
+    return;
+  }
+  // follow a tapped path, one tile at a time
+  if(fieldInputAllowed() && W.path && W.path.length){
+    const next = W.path.shift();
+    const dx=next.x-p.tx, dy=next.y-p.ty;
+    if(dx>0)p.dir="right"; else if(dx<0)p.dir="left"; else if(dy>0)p.dir="down"; else if(dy<0)p.dir="up";
+    if(isWalkable(next.x,next.y)){
+      p.moving=true; p.moveT=0;
+      p.fromX=p.tx; p.fromY=p.ty; p.toX=next.x; p.toY=next.y;
+    } else { W.path=null; }
+    if(W.path && !W.path.length){
+      const ft=W.path._faceTarget;
+      if(ft){ if(ft.x>next.x)p.dir="right"; else if(ft.x<next.x)p.dir="left"; else if(ft.y>next.y)p.dir="down"; else if(ft.y<next.y)p.dir="up"; }
+      W.path=null;
+    }
+  }
+}
+function updateFacing(){
+  const p=W.player;
+  const [dx,dy]=DIRV[p.dir];
+  const fx=p.tx+dx, fy=p.ty+dy;
+  const def=tileDef(W.map,fx,fy);
+  if(def.interact && !p.moving && fieldInputAllowed()){
+    W.facing = {x:fx,y:fy,def};
+    const verb = def.label||"interact";
+    showFieldPrompt(isTouch ? `Ⓐ  ${verb}` : `Ⓑ / Space  ·  ${verb}`);
+    actBtn.classList.remove("hidden");
+  } else {
+    W.facing = null;
+    hideFieldPrompt();
+    actBtn.classList.add("hidden");
+  }
+}
+function updateCamera(){
+  const p=W.player, map=W.map;
+  const pxCenter=(p.fx+0.5)*TILE, pyCenter=(p.fy+0.5)*TILE;
+  const viewWpx=map.viewW*TILE, viewHpx=map.viewH*TILE;
+  const mapWpx=map.rows[0].length*TILE, mapHpx=map.rows.length*TILE;
+  W.cam.x = clamp(pxCenter-viewWpx/2, 0, Math.max(0,mapWpx-viewWpx));
+  W.cam.y = clamp(pyCenter-viewHpx/2, 0, Math.max(0,mapHpx-viewHpx));
+}
+function drawFrame(){
+  const map=W.map;
+  sctx.clearRect(0,0,stage.width,stage.height);
+  const camX=W.cam.x, camY=W.cam.y;
+  const cols=map.rows[0].length, rowsN=map.rows.length;
+  const startCol=Math.max(0,Math.floor(camX/TILE));
+  const endCol=Math.min(cols, Math.ceil((camX+stage.width)/TILE));
+  // margin: tall props hang up to ~6px above their tile; extend range so nothing pops in/out
+  const startRow=Math.max(0,Math.floor(camY/TILE));
+  const endRow=Math.min(rowsN, Math.ceil((camY+stage.height)/TILE)+1);
+  const isTall = ch => "RKVGTc".includes(ch); // register, clerk, vending, sign, train-door, counter (draw upward)
+  // pass 1: ground/flat tiles only (so a tall prop is never overpainted by a later flat tile)
+  for(let ty=startRow; ty<endRow; ty++){
+    for(let tx=startCol; tx<endCol; tx++){
+      const ch=tileChar(map,tx,ty);
+      if(isTall(ch)) continue;
+      const def=map.legend[ch]||map.legend["."];
+      const ox=Math.round(tx*TILE-camX), oy=Math.round(ty*TILE-camY);
+      if(def&&def.draw) def.draw(sctx,ox,oy,tx,ty);
+    }
+  }
+  // pass 2: tall props, top-to-bottom, drawing their floor underlay first
+  for(let ty=startRow; ty<endRow; ty++){
+    for(let tx=startCol; tx<endCol; tx++){
+      const ch=tileChar(map,tx,ty);
+      if(!isTall(ch)) continue;
+      const def=map.legend[ch]||map.legend["."];
+      const ox=Math.round(tx*TILE-camX), oy=Math.round(ty*TILE-camY);
+      if(def&&def.draw) def.draw(sctx,ox,oy,tx,ty);
+    }
+  }
+  const ppx=Math.round(W.player.fx*TILE-camX);
+  const ppy=Math.round(W.player.fy*TILE-camY);
+  drawPlayer(sctx, ppx, ppy-4, W.player.dir, W.player.frame);
+}
+function loop(now){
+  if(!W.active) return;
+  const dt = Math.min(50, now-(lastFrameTime||now));
+  lastFrameTime = now;
+  updateMovement(dt);
+  updateCamera();
+  updateFacing();
+  drawFrame();
+  W.raf = requestAnimationFrame(loop);
+}
+
+/* ---------------------------------------------------------- field prompt */
+function showFieldPrompt(text){ fieldPrompt.textContent=text; fieldPrompt.classList.add("on"); }
+function hideFieldPrompt(){ fieldPrompt.classList.remove("on"); }
+
+/* ---------------------------------------------------------- shelf / clerk / register dialogs */
+function dboxRow(it){
+  return `<div class="dbox-row">
+    <div class="rart">${it.art()}</div>
+    <div class="rtxt"><b>${it.ro}</b><div class="rtag">${it.tag}</div></div>
+    <div class="rprice">${yen(it.price)}</div>
+    <button class="radd" data-add="${it.id}" aria-label="Add ${it.ro}">＋</button>
+  </div>`;
+}
+function wireDialogClicks(){
+  const closeBtn = $("#dboxClose"); if(closeBtn) closeBtn.addEventListener("click",closeDialog);
+  dialogBox.onclick = (e)=>{
+    if(e.target===dialogBox){ closeDialog(); return; }
+    const b=e.target.closest("[data-add]"); if(!b) return;
+    addToCart(b.dataset.add);
+    const foot=dialogBox.querySelector(".dbox-foot");
+    if(foot) foot.textContent = cartCount()?`You have ${cartCount()} in your basket.`:"Tap ＋ to add something.";
+  };
+}
+function openShelfDialog(secId, icon){
+  Sound.tick();
+  const items = availableItems().filter(i=>i.sec===secId);
+  const section = SECTIONS.find(s=>s.id===secId);
+  dialogBox.innerHTML = `
+    <div class="dbox-panel">
+      <div class="dbox-head"><span class="ic">${pxIcon(SECTION_ICON[secId]||"cart",22)}</span><h3 class="jp">${section.jp}</h3>
+        <span class="sub">${section.en} · ${items.length} item${items.length!==1?"s":""}</span>
+        <button class="dbox-close" id="dboxClose">${pxIcon("cross",14)}</button></div>
+      <div class="dbox-body">
+        ${items.length ? items.map(dboxRow).join("")
+          : `<div class="dbox-empty">Nothing on this shelf right now —<br>try another aisle or come back another season.</div>`}
+      </div>
+      <div class="dbox-foot">${cartCount()?`You have ${cartCount()} in your basket.`:"Tap ＋ to add something."}</div>
+    </div>`;
+  dialogBox.classList.add("on");
+  wireDialogClicks();
+}
+function openClerkDialog(){
+  Sound.tick();
+  pickRecommend();
   const rec = session.recommend;
-  render(`
-  <div class="topbar"><div class="wrap">
-    <button class="topback" id="leaveStore" title="Back" aria-label="Back">‹</button>
-    <button class="logo" id="storeLogo" title="Back">ヨリミチ <small>24H</small></button>
-    <button class="timepill" id="timePill" title="Change time & season" aria-label="Change time and season">
+  dialogBox.innerHTML = rec ? `
+    <div class="dbox-panel">
+      <div class="dbox-head"><span class="ic">${pxIcon("person",22)}</span><h3 class="jp">Clerk's pick today</h3>
+        <button class="dbox-close" id="dboxClose">${pxIcon("cross",14)}</button></div>
+      <div class="dbox-body">${dboxRow(Object.assign({},rec,{tag:`"${rec.tag}. I'd get it."`}))}</div>
+      <div class="dbox-foot">${cartCount()?`You have ${cartCount()} in your basket.`:"Tap ＋ to add something."}</div>
+    </div>` : `
+    <div class="dbox-panel">
+      <div class="dbox-head"><span class="ic">${pxIcon("person",22)}</span><h3 class="jp">いらっしゃいませ</h3>
+        <button class="dbox-close" id="dboxClose">${pxIcon("cross",14)}</button></div>
+      <div class="dbox-body"><div class="dbox-empty">The clerk gives a friendly nod.</div></div>
+    </div>`;
+  dialogBox.classList.add("on");
+  wireDialogClicks();
+}
+function closeDialog(){
+  Sound.tick();
+  dialogBox.classList.remove("on");
+  setTimeout(()=>{ if(!dialogBox.classList.contains("on")) dialogBox.innerHTML=""; },200);
+}
+function tryGoRegister(){
+  if(cartCount()===0){ toast("Your basket's empty — grab something first"); Sound.error(); return; }
+  Sound.tick();
+  goRegister();
+}
+
+/* ---------------------------------------------------------- store HUD */
+function buildStoreHUD(){
+  whud.innerHTML = `
+    <button class="topback" id="leaveStoreBtn" title="Leave the store" aria-label="Leave the store">‹</button>
+    <button class="logo" id="storeLogoBtn" title="Leave the store">ヨリミチ <small>24H</small></button>
+    <button class="timepill" id="timePillBtn" title="Change time & season" aria-label="Change time and season">
       <span class="tp-full">${TIME_LABEL[session.time]} · ${SEASON_LABEL[session.season]}</span>
-      <span class="tp-mini">${TIME_EMOJI[session.time]}${SEASON_EMOJI[session.season]}</span>
+      <span class="tp-mini">${pxIcon(TIME_ICON[session.time],18)}${pxIcon(SEASON_ICON[session.season],18)}</span>
     </button>
     <div class="topspace"></div>
     <button class="balance" id="balPill" title="Recharge balance"><span class="ic"></span><b id="balTop">${yen(session.balance)}</b></button>
-    <button class="basketbtn" id="openBasket"><span class="bk-label">かご</span><span class="bk-ico" aria-hidden="true">🧺</span> <span class="count" id="cnt">${cartCount()}</span></button>
-    <button class="iconbtn topicon js-sound" title="Sound" aria-label="Toggle sound">${Sound.isEnabled()?"🔊":"🔇"}</button>
-    <button class="iconbtn topicon js-pass" title="Konbini passport" aria-label="Open passport">📖</button>
-  </div></div>
-  <div class="aisles"><div class="wrap" id="aisles">
-    ${SECTIONS.map(s=>`<button class="aisle" data-sec="${s.id}" aria-selected="${s.id===currentSection}">
-      <span>${s.ic}</span><span class="jp">${s.en}</span></button>`).join("")}
-  </div></div>
-  <div class="storebody"><div class="wrap">
-    ${currentSection==="all" && rec ? `
-      <div class="recommend">
-        ${rec.art()}
-        <div class="rtxt"><b>Clerk's pick today</b><p>"${rec.ro}? ${rec.tag}. I'd get it." — ${yen(rec.price)}</p></div>
-        <button class="add" data-add="${rec.id}" aria-label="Add recommended" style="margin-left:auto">＋</button>
-      </div>`:""}
-    <div class="sectionhead">
-      <h2 class="jp">${SECTIONS.find(s=>s.id===currentSection).jp}</h2>
-      <span class="sub">${SECTIONS.find(s=>s.id===currentSection).en} · ${items.length} item${items.length!==1?"s":""}</span>
-    </div>
-    ${items.length?`<div class="shelf">${items.map(productCard).join("")}</div>`
-      :`<div class="empty"><div>${Art.basket()}</div>Nothing on this shelf right now —<br>try another aisle or come back another season.</div>`}
-    <div style="text-align:center;margin-top:34px">
-      <button class="cta" id="toRegister">Go to the register →</button>
-      <div class="fineprint" id="storeStatus" style="margin:10px auto 0">Tap a shelf item to add it. ${cartCount()?`You have ${cartCount()} in your basket.`:"Take your time."}</div>
-    </div>
-  </div></div>`);
-
-  // listeners
-  document.body.classList.add("in-store");
-  $("#leaveStore").addEventListener("click",()=>{ Sound.tick(); Sound.stopAmbient(); showTitle(); });
-  $("#storeLogo").addEventListener("click",()=>{ Sound.tick(); Sound.stopAmbient(); showTitle(); });
-  $("#timePill").addEventListener("click",()=>{ Sound.tick(); openTimeSeason(); });
+    <button class="basketbtn" id="openBasketBtn"><span class="bk-label">かご</span><span class="bk-ico" aria-hidden="true">${pxIcon("cart",18)}</span> <span class="count" id="cnt">${cartCount()}</span></button>
+    <button class="iconbtn topicon js-sound" title="Sound" aria-label="Toggle sound">${pxIcon(Sound.isEnabled()?"soundOn":"soundOff",18)}</button>
+    <button class="iconbtn topicon js-pass" title="Konbini passport" aria-label="Open passport">${pxIcon("book",18)}</button>`;
+  $("#leaveStoreBtn").addEventListener("click",()=>{ Sound.tick(); Sound.stopAmbient(); leaveStoreToStreet(); });
+  $("#storeLogoBtn").addEventListener("click",()=>{ Sound.tick(); Sound.stopAmbient(); leaveStoreToStreet(); });
+  $("#timePillBtn").addEventListener("click",()=>{ Sound.tick(); openTimeSeason(); });
   $("#balPill").addEventListener("click",()=>{ Sound.tick(); openCharge(); });
-  $("#aisles").addEventListener("click",e=>{const b=e.target.closest("[data-sec]");if(!b)return;
-    aisleScrollLeft = $("#aisles").scrollLeft;
-    Sound.tick(); showStore(b.dataset.sec);});
-  $("#openBasket").addEventListener("click",()=>{Sound.tick();openDrawer();});
-  $("#toRegister").addEventListener("click",()=>{
-    if(cartCount()===0){toast("Your basket's empty — grab something first 🍙");Sound.error();return;}
-    goRegister();
-  });
-  app.addEventListener("click",storeAddHandler);
+  $("#openBasketBtn").addEventListener("click",()=>{ Sound.tick(); openDrawer(); });
+  resizeStage();
+}
+function refreshStoreHUD(){
+  const tp = $("#timePillBtn"); if(!tp) return;
+  tp.querySelector(".tp-full").textContent = `${TIME_LABEL[session.time]} · ${SEASON_LABEL[session.season]}`;
+  tp.querySelector(".tp-mini").innerHTML = `${pxIcon(TIME_ICON[session.time],18)}${pxIcon(SEASON_ICON[session.season],18)}`;
+}
+function onTimeSeasonChanged(){
+  setTod();                 // updates W.tod + body class
+  refreshStoreHUD();        // update the pill (no-op if pill absent)
+  pickRecommend();          // re-roll clerk pick for the new time/season stock
+  if(typeof _artCache!=="undefined") _artCache.clear();
+  const jt=$("#jTime");     // if we're on the journey-choice screen, refresh its label
+  if(jt) jt.innerHTML = `${pxIcon(TIME_ICON[session.time],14)} ${TIME_LABEL[session.time]} · ${SEASON_LABEL[session.season]} — change`;
+}
 
-  // keep the aisle bar where the player left it (don't snap back to the left)
-  const ab=$("#aisles");
-  if(ab) ab.scrollLeft = aisleScrollLeft || 0;
+/* ---------------------------------------------------------- scene entry points */
+function showJourneyChoice(){
+  W.active=false;
+  setTod();
+  document.body.classList.remove("rpg-active","rpg-in-store","in-store");
+  render(`
+    <div class="screen journey-choose">
+      <h1 class="jp jchoose-title">ヨリミチ</h1>
+      <p class="jchoose-sub">How do you want to head to the store?</p>
+      <div class="jchoose-row">
+        <button class="jchoose-card" id="jWalk">
+          <div class="jchoose-emoji">${pxIcon("walk",40)}</div>
+          <b>Walk</b><span>Down the street, past the vending machine.</span>
+        </button>
+        <button class="jchoose-card" id="jTrain">
+          <div class="jchoose-emoji">${pxIcon("train",40)}</div>
+          <b>Take the train</b><span>A short ride, then a little walk in.</span>
+        </button>
+      </div>
+      <button class="jchoose-time" id="jTime">${pxIcon(TIME_ICON[session.time],14)} ${TIME_LABEL[session.time]} · ${SEASON_LABEL[session.season]} — change</button>
+    </div>`);
+  $("#jWalk").addEventListener("click",()=>{ Sound.tick(); enterExterior(); });
+  $("#jTrain").addEventListener("click",()=>{ Sound.tick(); enterSubwayFromStreet(); });
+  $("#jTime").addEventListener("click",()=>{ Sound.tick(); openTimeSeason(); });
 }
-function storeAddHandler(e){
-  const a=e.target.closest("[data-add]"); if(!a)return;
-  addToCart(a.dataset.add);
+function enterExterior(spawnOverride){
+  bgmAllowed=true; bgmKind="title";
+  Sound.startAmbient("title");
+  setTod();
+  whud.innerHTML = "";
+  enterScene(STREET_MAP, spawnOverride);
 }
-function productCard(it){
-  const q=session.cart[it.id]||0;
-  const badge = it.ltd?`<span class="badge ltd">LIMITED</span>`
-    : it.hot?`<span class="badge hot">HOT</span>`
-    : it.season?`<span class="badge season">SEASONAL</span>`
-    : it.cold?`<span class="badge cold">COLD</span>`:"";
-  return `<button class="product" data-add="${it.id}">
-    ${badge}${q?`<span class="qtydot">${q}</span>`:""}
-    <div class="art">${it.art()}</div>
-    <div class="nm">${it.jp}<span class="ro">${it.ro}</span></div>
-    <div class="dsc">${it.tag}</div>
-    <div class="foot"><span class="price">${yen(it.price)}<small> 税込</small></span><span class="add">＋</span></div>
-  </button>`;
+function enterStore(){
+  Sound.resume(); Sound.chime();
+  bgmAllowed=true; bgmKind="store";
+  setTimeout(()=>Sound.startAmbient("store"), 400);
+  setTod();
+  session.arrived = true;
+  buildStoreHUD();
+  enterScene(STORE_MAP);
+  pickRecommend();
+  toast("いらっしゃいませ！ — Welcome in.");
 }
+function leaveStoreToStreet(){ enterExterior({x:5,y:2,dir:"down"}); }
+function enterSubwayFromStreet(){
+  Sound.tick();
+  bgmAllowed=true; bgmKind="title";
+  setTod();
+  whud.innerHTML="";
+  enterScene(SUBWAY_MAP, {x:5,y:8,dir:"up"});
+  toast("Take the train to the store, or head back up.");
+}
+function leaveSubwayToStreet(){ enterExterior({x:8,y:11,dir:"down"}); }
+
+/* the pixel train ride — a short cutscene, then arrive at the store */
+function boardTrain(){
+  if(trainRiding) return;
+  trainRiding = true;
+  W.active = false;                 // pause field engine
+  Sound.tick(); Sound.chime();
+  runTrainRide(()=>{ trainRiding=false; enterStore(); });
+}
+let trainRiding = false;
+function backToStore(){
+  bgmAllowed=true; bgmKind="store";
+  Sound.startAmbient("store");
+  resumeFieldEngine();
+}
+
+/* ---------------------------------------------------------- signboard & vending dialogs */
+function openSignboard(){
+  Sound.tick();
+  openTimeSeason();   // reuse the existing time/season chooser modal
+}
+function openVending(){
+  Sound.tick();
+  const stock = ["drk_boss","drk_pocari","drk_ocha"].map(itemById).filter(Boolean);
+  dialogBox.innerHTML = `
+    <div class="dbox-panel">
+      <div class="dbox-head"><span class="ic">${pxIcon("drink",22)}</span><h3 class="jp">自動販売機</h3>
+        <span class="sub">Vending machine · pay from balance</span>
+        <button class="dbox-close" id="dboxClose">${pxIcon("cross",14)}</button></div>
+      <div class="dbox-body">
+        ${stock.map(it=>`<div class="dbox-row">
+          <div class="rart">${it.art()}</div>
+          <div class="rtxt"><b>${it.ro}</b><div class="rtag">${it.en}</div></div>
+          <div class="rprice">${yen(it.price)}</div>
+          <button class="radd" data-vend="${it.id}" aria-label="Buy ${it.ro}">＋</button>
+        </div>`).join("")}
+      </div>
+      <div class="dbox-foot">A cold one from the machine, straight away.</div>
+    </div>`;
+  dialogBox.classList.add("on");
+  const cb=$("#dboxClose"); if(cb) cb.addEventListener("click",closeDialog);
+  dialogBox.onclick=(e)=>{
+    if(e.target===dialogBox){ closeDialog(); return; }
+    const b=e.target.closest("[data-vend]"); if(!b) return;
+    const it=itemById(b.dataset.vend); if(!it) return;
+    if(session.balance < it.price){ showInsufficient(); return; }
+    session.balance -= it.price;
+    session.vendBought = (session.vendBought||0)+1;
+    Sound.coin();
+    refreshStoreHUD(); updateBalTop();
+    const foot=dialogBox.querySelector(".dbox-foot");
+    if(foot) foot.textContent = `${it.ro} — enjoy. Balance ${yen(session.balance)}.`;
+    toast(`${it.ro} — グビグビ`);
+  };
+}
+function updateBalTop(){ const bt=$("#balTop"); if(bt) bt.textContent=yen(session.balance); }
+
+/* ---------------------------------------------------------- pixel train ride */
+function runTrainRide(done){
+  document.body.classList.remove("rpg-in-store","in-store");
+  hideFieldPrompt(); actBtn.classList.add("hidden");
+  whud.innerHTML="";
+  try{ Sound.depart && Sound.depart(); }catch(e){}
+  const tod = W.tod||"day";
+  // scenery palette per time of day (far background seen through windows)
+  const SKY = { morning:"#f6d9b0", day:"#bfe3ef", evening:"#f0b48a", late:"#1a2340" };
+  const GROUND = { morning:"#8fae7e", day:"#8fbf87", evening:"#7a8a6a", late:"#20304a" };
+  const BUILDING = { morning:"#c9a98a", day:"#b7c0c4", evening:"#a07a6a", late:"#2a3a5a" };
+  const sky=SKY[tod], ground=GROUND[tod], bld=BUILDING[tod];
+  // set canvas to a portrait car view (tall, to match phones and minimize crop)
+  const VW=11, VH=19;
+  stage.width=VW*TILE; stage.height=VH*TILE;
+  resizeStageFixed(VW,VH);
+  const start=performance.now(); const DUR=4200;
+  let scenery=0;
+  function frame(now){
+    const t=now-start;
+    scenery=(scenery+2.4);
+    const c=sctx; c.imageSmoothingEnabled=false;
+    const w=stage.width,h=stage.height;
+    // ---- car interior background
+    c.fillStyle="#e6e9ea"; c.fillRect(0,0,w,h);
+    // floor
+    c.fillStyle="#c4cace"; c.fillRect(0,h-40,w,40);
+    c.fillStyle="#aab2b6"; c.fillRect(0,h-40,w,3);
+    // ceiling
+    c.fillStyle="#d2d7d9"; c.fillRect(0,0,w,26);
+    c.fillStyle="#b7c0c4"; c.fillRect(0,26,w,2);
+    // ---- window band with scrolling scenery
+    const wy=34, wh=64;
+    c.fillStyle=sky; c.fillRect(0,wy,w,wh);
+    c.fillStyle=ground; c.fillRect(0,wy+wh-16,w,16);
+    // parallax buildings
+    for(let i=0;i<14;i++){
+      const bx=((i*70 - scenery) % (w+70));
+      const x = bx<0?bx+w+70:bx;
+      const bh=20+((i*37)%34);
+      c.fillStyle=bld; c.fillRect(x, wy+wh-16-bh, 40, bh);
+      c.fillStyle=tod==="late"?"#f2c85a":"rgba(255,255,255,.5)";
+      for(let wyy=0; wyy<bh-6; wyy+=8){ c.fillRect(x+5, wy+wh-16-bh+4+wyy, 4,4); c.fillRect(x+14, wy+wh-16-bh+4+wyy, 4,4); c.fillRect(x+23, wy+wh-16-bh+4+wyy, 4,4); }
+    }
+    if(tod==="late"){ c.fillStyle="#fff"; for(let s=0;s<20;s++){ const sx=(s*53)%w, sy=wy+((s*29)%28); c.fillRect(sx,sy,1,1); } }
+    // window frame mullions
+    c.fillStyle="#96a0a4";
+    c.fillRect(0,wy-4,w,4); c.fillRect(0,wy+wh,w,5);
+    for(let mx=0; mx<=w; mx+=w/4){ c.fillRect(mx-3,wy-4,6,wh+9); }
+    // ---- seats (blue bench) below window
+    c.fillStyle="#3f6fb0"; c.fillRect(0,wy+wh+5,w,26);
+    c.fillStyle="#345c94"; c.fillRect(0,wy+wh+5,w,4);
+    c.fillStyle="#2b4c7a"; c.fillRect(0,wy+wh+5+26,w,4);
+    // grab handles
+    c.fillStyle="#b7a06a";
+    for(let hx=20; hx<w; hx+=44){ c.fillRect(hx,28,2,12); c.strokeStyle="#b7a06a"; c.lineWidth=2; c.beginPath(); c.arc(hx+1,44,5,0,Math.PI*2); c.stroke(); }
+    // ---- player standing in the car, gentle bob, scaled up to match the big car
+    const bob = Math.sin(t/120)>0?0:1;
+    const PS = 3.6; // player scale in the ride scene
+    c.save();
+    c.imageSmoothingEnabled=false;
+    c.translate(w/2, h-40);
+    c.scale(PS,PS);
+    drawPlayer(c, -8, -16 - bob, "down", bob);
+    c.restore();
+    // ---- vignette + caption
+    c.fillStyle="rgba(10,14,20,"+(t<400?(1-t/400)*0.9:(t>DUR-500?(t-(DUR-500))/500*0.9:0))+")";
+    c.fillRect(0,0,w,h);
+    if(t<DUR){ requestAnimationFrame(frame); }
+    else { done(); }
+  }
+  requestAnimationFrame(frame);
+}
+function resizeStageFixed(vw,vh){
+  const availW=window.innerWidth, availH=window.innerHeight;
+  const fitW=availW/(vw*TILE), fitH=availH/(vh*TILE);
+  const portraitish = availW <= availH * 1.15;
+  let scale = portraitish ? Math.max(fitW,fitH) : Math.min(fitW,fitH);
+  scale = Math.min(scale, 6);
+  if(!isFinite(scale)||scale<=0) scale=1;
+  const cssW=vw*TILE*scale, cssH=vh*TILE*scale;
+  stage.style.width=cssW+"px";
+  stage.style.height=cssH+"px";
+  stage.style.left="50%"; stage.style.transform="translateX(-50%)";
+  stage.style.top=((availH-cssH)/2)+"px";
+}
+
+/* ---------------------------------------------------------- virtual joystick + action button */
+const JOY_RADIUS=42, JOY_DEAD=14, JOY_START=16;
+let joyPointerId=null, joyOrigin={x:0,y:0}, joyEngaged=false;
+function joyDirFromDelta(dx,dy){
+  const dist=Math.hypot(dx,dy);
+  if(dist<JOY_DEAD) return null;
+  return Math.abs(dx)>Math.abs(dy) ? (dx>0?"right":"left") : (dy>0?"down":"up");
+}
+function moveJoy(e){
+  const dx=e.clientX-joyOrigin.x, dy=e.clientY-joyOrigin.y;
+  const dist=Math.hypot(dx,dy);
+  // require an intentional drag past JOY_START before the stick "engages" — kills the
+  // phantom first-direction from a finger that lands off-center
+  if(!joyEngaged){
+    if(dist < JOY_START){ W.heldDir=null; joyKnob.style.transform="translate(0px,0px)"; return; }
+    joyEngaged=true;
+  }
+  const clamped=Math.min(dist,JOY_RADIUS);
+  const ang=Math.atan2(dy,dx);
+  joyKnob.style.transform = `translate(${Math.cos(ang)*clamped}px,${Math.sin(ang)*clamped}px)`;
+  W.heldDir = joyDirFromDelta(dx,dy);
+}
+function endJoy(e){
+  if(e.pointerId!==joyPointerId) return;
+  joyPointerId=null; joyEngaged=false; W.heldDir=null;
+  joyKnob.style.transform="translate(0px,0px)";
+}
+joyBase.addEventListener("pointerdown", e=>{
+  if(!fieldInputAllowed()) return;
+  e.preventDefault();
+  joyPointerId=e.pointerId;
+  // anchor the stick's origin to WHERE the finger actually landed, not the base center,
+  // so a fat-fingered / off-center press starts perfectly neutral
+  joyOrigin={x:e.clientX, y:e.clientY};
+  joyEngaged=false;
+  W.heldDir=null;
+  joyKnob.style.transform="translate(0px,0px)";
+  try{ joyBase.setPointerCapture(e.pointerId); }catch(err){}
+});
+joyBase.addEventListener("pointermove", e=>{ if(e.pointerId===joyPointerId){ e.preventDefault(); moveJoy(e); } });
+joyBase.addEventListener("pointerup", endJoy);
+joyBase.addEventListener("pointercancel", endJoy);
+actBtn.addEventListener("pointerdown", e=>{
+  e.preventDefault();
+  if(!fieldInputAllowed()) return;
+  if(W.facing && W.facing.def.interact) W.facing.def.interact();
+});
+
+/* ---- tap-to-move: BFS a path to the tapped tile (or interact if tapping an interactable) */
+function bfsPath(sx,sy,gx,gy){
+  const map=W.map; if(!map) return null;
+  const key=(x,y)=>x+","+y;
+  const q=[{x:sx,y:sy}]; const prev={}; prev[key(sx,sy)]=null;
+  const W_=map.rows[0].length, H_=map.rows.length;
+  let found=false;
+  while(q.length){
+    const cur=q.shift();
+    if(cur.x===gx && cur.y===gy){ found=true; break; }
+    for(const [dx,dy] of [[0,-1],[0,1],[-1,0],[1,0]]){
+      const nx=cur.x+dx, ny=cur.y+dy;
+      if(nx<0||ny<0||nx>=W_||ny>=H_) continue;
+      const k=key(nx,ny);
+      if(k in prev) continue;
+      if(!isWalkable(nx,ny)) continue;
+      prev[k]={x:cur.x,y:cur.y}; q.push({x:nx,y:ny});
+    }
+    if(q.length>2000) break; // safety
+  }
+  if(!found) return null;
+  const path=[]; let c={x:gx,y:gy};
+  while(c){ path.push({x:c.x,y:c.y}); c=prev[key(c.x,c.y)]; }
+  path.reverse(); path.shift(); // drop the starting tile
+  return path;
+}
+function stageToTile(clientX, clientY){
+  const r=stage.getBoundingClientRect();
+  const sx=(clientX-r.left)/r.width * stage.width;
+  const sy=(clientY-r.top)/r.height * stage.height;
+  const tx=Math.floor((sx + W.cam.x)/TILE);
+  const ty=Math.floor((sy + W.cam.y)/TILE);
+  return {tx,ty};
+}
+function onStageTap(clientX, clientY){
+  if(!fieldInputAllowed()) return;
+  const {tx,ty}=stageToTile(clientX,clientY);
+  if(tx<0||ty<0||ty>=W.map.rows.length||tx>=W.map.rows[0].length) return;
+  const def=tileDef(W.map,tx,ty);
+  const p=W.player;
+  // tapping an interactable you're adjacent to → face + interact
+  const adj = Math.abs(tx-p.tx)+Math.abs(ty-p.ty)===1;
+  if(def.interact){
+    if(adj){
+      if(tx>p.tx)p.dir="right"; else if(tx<p.tx)p.dir="left"; else if(ty>p.ty)p.dir="down"; else p.dir="up";
+      def.interact(); return;
+    }
+    // otherwise walk to the nearest walkable tile next to it, then it'll be facing-interactable
+    const spots=[[tx,ty-1],[tx,ty+1],[tx-1,ty],[tx+1,ty]].filter(([x,y])=>isWalkable(x,y));
+    let best=null,bestLen=1e9;
+    for(const [x,y] of spots){ const pa=bfsPath(p.tx,p.ty,x,y); if(pa&&pa.length<bestLen){best=pa;bestLen=pa.length;} }
+    if(best){ W.path=best; W.path._faceTarget={x:tx,y:ty}; }
+    return;
+  }
+  if(!isWalkable(tx,ty)) return;
+  const path=bfsPath(p.tx,p.ty,tx,ty);
+  if(path && path.length){ W.path=path; Sound.tick(); }
+}
+stage.addEventListener("pointerdown", e=>{ e.preventDefault(); onStageTap(e.clientX, e.clientY); });
+
+const KEYMAP = {ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right",w:"up",s:"down",a:"left",d:"right",W:"up",S:"down",A:"left",D:"right"};
+const INTERACT_KEYS = {" ":1,"Enter":1,"b":1,"B":1,"e":1,"E":1};
+let keyHeld=null;
+document.addEventListener("keydown", e=>{
+  if(KEYMAP[e.key]){ if(fieldInputAllowed()){ keyHeld=KEYMAP[e.key]; W.heldDir=keyHeld; } }
+  else if(INTERACT_KEYS[e.key] && fieldInputAllowed()){
+    e.preventDefault();
+    if(W.facing && W.facing.def.interact) W.facing.def.interact();
+  }
+});
+document.addEventListener("keyup", e=>{
+  if(KEYMAP[e.key] && KEYMAP[e.key]===keyHeld){ keyHeld=null; W.heldDir=null; }
+});
+
 function addToCart(id){
   const it=itemById(id); if(!it)return;
   session.cart[id]=(session.cart[id]||0)+1;
@@ -1300,7 +2772,7 @@ function openDrawer(){
   const entries=Object.entries(session.cart).filter(([,q])=>q>0);
   d.innerHTML = `
     <header><h2 class="jp">かご <span style="color:var(--ink-soft);font-size:13px">(${cartCount()})</span></h2>
-      <button class="iconbtn" id="closeDrawer" style="box-shadow:none;background:#f0efe7">✕</button></header>
+      <button class="iconbtn" id="closeDrawer" style="box-shadow:none">${pxIcon("cross",14)}</button></header>
     <div class="items">
       ${entries.length?entries.map(([id,q])=>{const it=itemById(id);return `
         <div class="bitem">
@@ -1325,7 +2797,7 @@ function openDrawer(){
     const inc=e.target.closest("[data-inc]"), dec=e.target.closest("[data-dec]"), co=e.target.closest("#drawerCheckout");
     if(inc){session.cart[inc.dataset.inc]++;Sound.pop();openDrawer();syncStoreCounts();}
     else if(dec){const id=dec.dataset.dec;session.cart[id]--;if(session.cart[id]<=0)delete session.cart[id];Sound.tick();openDrawer();syncStoreCounts();}
-    else if(co){closeDrawer();if(cartCount()===0){toast("Basket's empty 🍙");Sound.error();return;}goRegister();}
+    else if(co){closeDrawer();if(cartCount()===0){toast("Basket's empty");Sound.error();return;}goRegister();}
   };
 }
 function closeDrawer(){ $("#drawer").classList.remove("on"); $("#scrim").classList.remove("on"); $("#drawer").setAttribute("aria-hidden","true"); syncStoreCounts(); }
@@ -1359,11 +2831,11 @@ function openTimeSeason(){
     <div class="msub">Sets the light outside and what's in stock.</div>
     <div class="eyebrow">Time of day</div>
     <div class="modalrow" id="mTod">
-      ${["morning","day","evening","late"].map(t=>`<button class="chip" data-tod="${t}" aria-pressed="${session.time===t}">${TIME_LABEL[t]}</button>`).join("")}
+      ${["morning","day","evening","late"].map(t=>`<button class="chip" data-tod="${t}" aria-pressed="${session.time===t}">${pxIcon(TIME_ICON[t],14)} ${TIME_LABEL[t]}</button>`).join("")}
     </div>
     <div class="eyebrow">Season</div>
     <div class="modalrow" id="mSea">
-      ${["spring","summer","autumn","winter"].map(s=>`<button class="chip" data-sea="${s}" aria-pressed="${session.season===s}">${SEASON_LABEL[s]}</button>`).join("")}
+      ${["spring","summer","autumn","winter"].map(s=>`<button class="chip" data-sea="${s}" aria-pressed="${session.season===s}">${pxIcon(SEASON_ICON[s],14)} ${SEASON_LABEL[s]}</button>`).join("")}
     </div>
     <div style="margin-top:18px"><button class="cta small" id="mDone">Done</button></div>
   `);
@@ -1371,7 +2843,7 @@ function openTimeSeason(){
     $$("#mTod [data-tod]").forEach(x=>x.setAttribute("aria-pressed", x.dataset.tod===session.time));});
   $("#mSea").addEventListener("click",e=>{const b=e.target.closest("[data-sea]");if(!b)return;Sound.tick();session.season=b.dataset.sea;
     $$("#mSea [data-sea]").forEach(x=>x.setAttribute("aria-pressed", x.dataset.sea===session.season));});
-  $("#mDone").addEventListener("click",()=>{Sound.tick();closeModal();pickRecommend();showStore(currentSection);});
+  $("#mDone").addEventListener("click",()=>{Sound.tick();closeModal();pickRecommend();onTimeSeasonChanged();});
 }
 
 function openCharge(){
@@ -1406,7 +2878,7 @@ function goRegister(){
   render(`
   <div class="register wrap">
     <button class="backbtn" id="regBack">‹ Back to the shop</button>
-    <div class="clerk-bubble"><span class="face">🧑‍🦱</span><span class="jp">いらっしゃいませ。お会計でよろしいですか？</span></div>
+    <div class="clerk-bubble"><span class="face">${pxIcon("person",24)}</span><span class="jp">いらっしゃいませ。お会計でよろしいですか？</span></div>
     <div class="scanlist" id="scanlist">
       ${rows.map((it,i)=>`<div class="scanrow" data-i="${i}">${it.art()}<span class="sn">${it.ro}</span><span class="sp">${yen(it.price)}</span></div>`).join("")}
     </div>
@@ -1421,12 +2893,6 @@ function goRegister(){
     else { askWarm(); }
   };
   setTimeout(scan,400);
-}
-
-function backToStore(){
-  bgmAllowed = true; bgmKind = "store";
-  Sound.startAmbient("store");
-  showStore(currentSection);
 }
 
 function hasHot(){ return Object.keys(session.cart).some(id=>{const it=itemById(id);return it&&it.hot;}); }
@@ -1478,10 +2944,10 @@ function choosePayment(){
     <div class="askbox">
       <h3 class="jp">お支払い方法は？</h3><p>That's <b>${yen(total)}</b>. How would you like to pay?<br><span class="fineprint" style="display:inline">Balance ${yen(session.balance)}</span></p>
       <div class="paygrid">
-        <button class="paymethod" data-pay="ic"><span class="pm-ic">🐧</span>IC card<small>Suica / Pasmo — tap</small></button>
-        <button class="paymethod" data-pay="cash"><span class="pm-ic">💴</span>Cash<small>Bills & coins</small></button>
-        <button class="paymethod" data-pay="qr"><span class="pm-ic">📱</span>QR pay<small>Scan the code</small></button>
-        <button class="paymethod" data-pay="card"><span class="pm-ic">💳</span>Credit / iD<small>Touch & go</small></button>
+        <button class="paymethod" data-pay="ic"><span class="pm-ic">${pxIcon("penguin",26)}</span>IC card<small>Suica / Pasmo — tap</small></button>
+        <button class="paymethod" data-pay="cash"><span class="pm-ic">${pxIcon("cash",26)}</span>Cash<small>Bills & coins</small></button>
+        <button class="paymethod" data-pay="qr"><span class="pm-ic">${pxIcon("qr",26)}</span>QR pay<small>Scan the code</small></button>
+        <button class="paymethod" data-pay="card"><span class="pm-ic">${pxIcon("card",26)}</span>Credit / iD<small>Touch & go</small></button>
       </div>
     </div>`;
   $("#regStep").onclick=e=>{const b=e.target.closest("[data-pay]");if(!b)return;
@@ -1516,12 +2982,12 @@ function payIC(){
       ${low?`<p class="lowbal">残高不足 — Not enough balance (${yen(session.balance)}). Recharge, or pay another way.</p>`:""}
       <div class="reader" id="reader">
         <span class="ripple"></span><span class="ripple"></span><span class="ripple"></span>
-        <div class="touchpad"><div class="pico">🐧</div>${low?"RECHARGE NEEDED":"TOUCH HERE"}<br>${yen(total)}</div>
+        <div class="touchpad"><div class="pico">${pxIcon("penguin",28)}</div>${low?"RECHARGE NEEDED":"TOUCH HERE"}<br>${yen(total)}</div>
       </div>
       <div class="iccard" id="theCard">
         <b>ヨリミチ IC</b>
         <div class="bal" id="cardBal">${yen(session.balance)}</div>
-        <span class="penguin">🐧</span>
+        <span class="penguin">${pxIcon("penguin",22)}</span>
       </div>
       <p class="tap-hint">${low?"Tap ＋ to recharge ¥1000, then touch the card to the reader.":"Tap your card on the reader to pay."}</p>
       <div class="askrow" style="margin-top:10px">
@@ -1536,11 +3002,11 @@ function payIC(){
     recharge(1000); Sound.coin();
     $("#cardBal").textContent=yen(session.balance);
     if(session.balance>=grandTotal()){ $(".lowbal")&&$(".lowbal").remove(); reader.classList.add("active");
-      reader.querySelector(".touchpad").innerHTML=`<div class="pico">🐧</div>TOUCH HERE<br>${yen(grandTotal())}`;
+      reader.querySelector(".touchpad").innerHTML=`<div class="pico">${pxIcon("penguin",28)}</div>TOUCH HERE<br>${yen(grandTotal())}`;
       $(".tap-hint").textContent="Recharged. Now tap your card to pay.";}
   });
   const tap=()=>{
-    if(session.balance<grandTotal()){toast("Recharge first 🐧");Sound.error();return;}
+    if(session.balance<grandTotal()){toast("Recharge first");Sound.error();return;}
     Sound.piLong();
     const total=grandTotal(); const before=session.balance; const target=before-total;
     G.icPays++;
@@ -1548,7 +3014,7 @@ function payIC(){
     const cd=setInterval(()=>{cur-=step; if(cur<=target){cur=target;clearInterval(cd);}
       balEl.textContent=yen(cur);},28);
     reader.classList.remove("active");
-    reader.querySelector(".touchpad").innerHTML=`<div class="pico">✓</div>ありがとう<br>${yen(total)}`;
+    reader.querySelector(".touchpad").innerHTML=`<div class="pico">${pxIcon("check",28)}</div>ありがとう<br>${yen(total)}`;
     setTimeout(()=>finishPay("IC card (タッチ決済)", total, 0),900);
   };
   reader.addEventListener("click",tap);
@@ -1616,7 +3082,7 @@ function payTouch(kind){
     <div class="tapstage">
       <div class="reader active" id="reader" style="background:radial-gradient(circle at 50% 40%,#2b3550,#14182b)">
         <span class="ripple"></span><span class="ripple"></span><span class="ripple"></span>
-        <div class="touchpad"><div class="pico">${kind==="qr"?"📱":"💳"}</div>${kind==="qr"?"SHOW QR":"TOUCH"}<br>${yen(total)}</div>
+        <div class="touchpad"><div class="pico">${kind==="qr"?pxIcon("qr",28):pxIcon("card",28)}</div>${kind==="qr"?"SHOW QR":"TOUCH"}<br>${yen(total)}</div>
       </div>
       ${device}
       <p class="tap-hint">${kind==="qr"?"Tap your phone's code on the scanner to pay.":"Tap your card on the reader to pay."}</p>
@@ -1629,7 +3095,7 @@ function payTouch(kind){
   const go=()=>{
     if(done)return; done=true;
     Sound.piLong();
-    const r=$("#reader"); if(r){ r.classList.remove("active"); r.querySelector(".touchpad").innerHTML=`<div class="pico">✓</div>ありがとう<br>${yen(total)}`; }
+    const r=$("#reader"); if(r){ r.classList.remove("active"); r.querySelector(".touchpad").innerHTML=`<div class="pico">${pxIcon("check",28)}</div>ありがとう<br>${yen(total)}`; }
     const dev=$("#payDevice"); if(dev) dev.style.opacity="0.5";
     setTimeout(()=>finishPay(label,total,0),800);
   };
@@ -1684,13 +3150,13 @@ function showReceipt(method,total,change,points){
       ${change>0?`<div class="rrow"><span class="nm">お預り Tendered</span><span>${yen(total+change)}</span></div>
       <div class="rrow"><span class="nm">お釣り Change</span><span>${yen(change)}</span></div>`:""}
       <div class="rmeta">
-        ${session.warmed?"温め済 / heated up ✓<br>":""}
+        ${session.warmed?`温め済 / heated up ${pxIcon("check",12)}<br>`:""}
         ${session.pointcard?`ポイント +${points}pt（カードに加算）<br>`:`ポイントカード未提示<br>`}
         またのお越しをお待ちしております。<br>Thank you — please come again.
       </div>
       <div class="stamp">領収</div>
     </div>
-    ${session.pointcard?`<div class="points">⭐ Earned ${points} point${points!==1?"s":""} this visit</div>`:""}
+    ${session.pointcard?`<div class="points">${pxIcon("star",14)} Earned ${points} point${points!==1?"s":""} this visit</div>`:""}
     <button class="cta" id="goEnjoy">Take it somewhere & eat →</button>
   </div>`);
   $("#goEnjoy").addEventListener("click",()=>{Sound.tick();startEnjoy();});
@@ -1698,25 +3164,38 @@ function showReceipt(method,total,change,points){
 
 /* =========================================================== ENJOY */
 function enjoySpotSVG(time){
-  const night=time==="late"||time==="evening";
-  const sky=time==="morning"?"#FBE6C9":time==="day"?"#CDEAF1":time==="evening"?"#E8A06A":"#10162C";
-  return `<svg viewBox="0 0 600 240" xmlns="http://www.w3.org/2000/svg" class="enjoyscene">
-    <rect width="600" height="240" fill="${sky}"/>
-    ${night?'<circle cx="500" cy="44" r="22" fill="#F6F0D8"/>':'<circle cx="80" cy="50" r="26" fill="#FFE9A8"/>'}
-    <!-- river -->
-    <rect y="150" width="600" height="90" fill="${night?'#15233a':'#9cc6cf'}"/>
-    <path d="M0 160 Q150 150 300 160 T600 160" stroke="#fff" stroke-width="2" opacity=".3" fill="none"/>
-    <path d="M0 178 Q150 170 300 180 T600 178" stroke="#fff" stroke-width="2" opacity=".2" fill="none"/>
-    <!-- far city lights -->
-    <g opacity="${night?0.9:0.5}">
-      ${Array.from({length:14}).map((_,i)=>`<rect x="${20+i*42}" y="${110-(i%4)*16}" width="26" height="${44+(i%4)*16}" fill="${night?'#22304d':'#bcd0d6'}"/>`).join("")}
-      ${night?Array.from({length:24}).map((_,i)=>`<rect x="${28+(i*23)%560}" y="${88+(i*17)%40}" width="4" height="4" fill="#FFE9A8"/>`).join(""):""}
-    </g>
-    <!-- bank / bench -->
-    <rect y="140" width="600" height="14" fill="${night?'#26324a':'#b7b6aa'}"/>
-    <rect x="250" y="120" width="100" height="8" rx="3" fill="#7a5c3a"/>
-    <rect x="258" y="128" width="6" height="16" fill="#5e4628"/><rect x="336" y="128" width="6" height="16" fill="#5e4628"/>
-  </svg>`;
+  // pixel riverbank scene, 40x16 grid -> 600x240 (each cell 15px). Time-of-day palette.
+  const night = time==="late";
+  const P = {
+    morning:{sky:"#FBE6C9",orb:"#FFD98A",water:"#a9cdd4",wave:"#c8e0e4",city:"#c9b79a",bank:"#b7a884",star:null},
+    day:    {sky:"#CDEAF1",orb:"#FFE9A8",water:"#9cc6cf",wave:"#bfe0e6",city:"#b6c6cc",bank:"#b7b6aa",star:null},
+    evening:{sky:"#E8A06A",orb:"#FFCE7A",water:"#7c93a6",wave:"#9fb1bf",city:"#7a5f6a",bank:"#6f5a52",star:null},
+    late:   {sky:"#10162C",orb:"#F6F0D8",water:"#15233a",wave:"#24405e",city:"#22304d",bank:"#26324a",star:"#FFE9A8"},
+  }[time]||{sky:"#CDEAF1",orb:"#FFE9A8",water:"#9cc6cf",wave:"#bfe0e6",city:"#b6c6cc",bank:"#b7b6aa",star:null};
+  const CELL=15, COLS=40, ROWS=16;
+  let r="";
+  const rect=(x,y,w,h,c)=>{ r+=`<rect x="${x*CELL}" y="${y*CELL}" width="${w*CELL}" height="${h*CELL}" fill="${c}"/>`; };
+  // sky
+  rect(0,0,COLS,10,P.sky);
+  // sun/moon (blocky disc)
+  const ox = night?32:5, oy=1;
+  rect(ox+1,oy,3,1,P.orb); rect(ox,oy+1,5,3,P.orb); rect(ox+1,oy+4,3,1,P.orb);
+  if(night){ rect(ox,oy+1,2,3,P.sky); } // crescent bite
+  // stars at night
+  if(P.star){ for(let i=0;i<18;i++){ const sx=(i*7+3)%COLS, sy=(i*5)%7; rect(sx,sy,1,1,P.star); } }
+  // far city skyline (blocky buildings)
+  for(let i=0;i<COLS;i+=3){ const bh=2+((i*7)%4); rect(i,10-bh,2,bh,P.city);
+    if(night){ rect(i,10-bh+1,1,1,"#FFE9A8"); } }
+  // bank strip
+  rect(0,10,COLS,1,P.bank);
+  // water
+  rect(0,11,COLS,5,P.water);
+  // wave lines
+  for(let i=0;i<COLS;i+=2){ rect(i,12,1,1,P.wave); }
+  for(let i=1;i<COLS;i+=2){ rect(i,14,1,1,P.wave); }
+  // bench (wood) centered on the bank
+  rect(16,9,8,1,"#7a5c3a"); rect(16,10,1,1,"#5e4628"); rect(23,10,1,1,"#5e4628");
+  return `<svg viewBox="0 0 ${COLS*CELL} ${ROWS*CELL}" xmlns="http://www.w3.org/2000/svg" class="enjoyscene" style="image-rendering:pixelated" preserveAspectRatio="xMidYMid slice">${r}</svg>`;
 }
 let enjoyIndex=0, enjoyItems=[];
 function startEnjoy(){
@@ -1762,9 +3241,9 @@ function showEnjoy(){
 
 /* =========================================================== PASSPORT */
 function obtainHint(it){
-  if(it.ltd) return "✨ Limited — keep visiting";
-  if(it.times){ const t=it.times; return (t.includes("evening")||t.includes("late")) ? "🌙 Evening / late only" : "🕒 "+t.join("/"); }
-  if(it.seasons){ const map={spring:"🌸 Spring",summer:"🏖️ Summer",autumn:"🍁 Autumn",winter:"❄️ Winter"};
+  if(it.ltd) return pxIcon("sparkle",12)+" Limited — keep visiting";
+  if(it.times){ const t=it.times; return (t.includes("evening")||t.includes("late")) ? pxIcon("moon",12)+" Evening / late only" : pxIcon("clock",12)+" "+t.join("/"); }
+  if(it.seasons){ const map={spring:pxIcon("sakura",12)+" Spring",summer:pxIcon("beach",12)+" Summer",autumn:pxIcon("maple",12)+" Autumn",winter:pxIcon("snow",12)+" Winter"};
     return it.seasons.map(s=>map[s]||s).join(" / "); }
   const sec=SECTIONS.find(s=>s.id===it.sec);
   return "in "+(sec?sec.en:it.sec);
@@ -1795,8 +3274,8 @@ function passportHTML(justFinished){
       <div class="stat"><b>${tried}/${totalItems}</b><span>items tried</span></div>
       <div class="stat"><b>${yen(G.totalSpent)}</b><span>spent over time</span></div>
       <div class="stat"><b>${G.icPays}</b><span>IC taps</span></div>
-      <div class="stat"><b>${G.points}<small style="font-size:14px"> pt</small></b><span>points earned ⭐</span></div>
-      <div class="stat"><b>${G.noBag}</b><span>times you brought your own 🌿</span></div>
+      <div class="stat"><b>${G.points}<small style="font-size:14px"> pt</small></b><span>points earned ${pxIcon("star",12)}</span></div>
+      <div class="stat"><b>${G.noBag}</b><span>times you brought your own ${pxIcon("leaf",12)}</span></div>
     </div>
 
     <div class="subhead"><span class="ln"></span><h2 class="jp">Things you've tried</h2><span class="ln"></span></div>
@@ -1812,7 +3291,7 @@ function passportHTML(justFinished){
 
     <div class="subhead" style="margin-top:22px"><span class="ln"></span><h2 class="jp">Stamps</h2><span class="ln"></span></div>
     <div class="achwrap">
-      ${ACHIEVEMENTS.map(a=>`<div class="ach ${G.achievements[a.id]?'':'locked'}">${G.achievements[a.id]?a.ic:"🔒"} ${a.name}</div>`).join("")}
+      ${ACHIEVEMENTS.map(a=>`<div class="ach ${G.achievements[a.id]?'':'locked'}">${G.achievements[a.id]?pxIcon(a.ic,16):pxIcon("lock",16)} ${a.name}</div>`).join("")}
     </div>
 
     <div style="text-align:center;margin-top:26px" class="cta-row">
@@ -1840,7 +3319,7 @@ function showPassport(justFinished){
   const q = sel => root.querySelector(sel);
   const leave = ()=>{
     Sound.tick();
-    if(justFinished){ newSession(); setPassDisabled(false); showTitle(); }
+    if(justFinished){ newSession(); setPassDisabled(false); enterExterior(); }
     else { closePassportOverlay(); }
   };
   q("#back").addEventListener("click",leave);
@@ -1851,26 +3330,26 @@ function showPassport(justFinished){
     if(!resetArmed){ resetArmed=true; btn.textContent="Tap again to erase all progress"; btn.classList.add("danger");
       Sound.error(); setTimeout(()=>{ const b2=q("#resetProg"); if(b2){resetArmed=false;b2.textContent="Reset everything (start fresh)";b2.classList.remove("danger");} },4000); return; }
     resetProgress(); Sound.stamp(); toast("Fresh start — empty passport, ¥5,000 balance.");
-    closePassportOverlay(); showTitle();
+    closePassportOverlay(); enterExterior();
   });
 }
 
 /* =========================================================== ACHIEVEMENTS */
 const ACHIEVEMENTS=[
-  {id:"first", ic:"🎉", name:"ただいま — First visit"},
-  {id:"late", ic:"🌙", name:"3AM run"},
-  {id:"onigiri_all", ic:"🍙", name:"All onigiri tried"},
-  {id:"big", ic:"💴", name:"Big haul (¥2000+)"},
-  {id:"warm", ic:"♨️", name:"Had it heated"},
-  {id:"ic5", ic:"🐧", name:"5 IC taps"},
-  {id:"lowbal", ic:"😅", name:"Cut it close (<¥200 left)"},
-  {id:"season", ic:"🌸", name:"Tried a seasonal item"},
-  {id:"mybag", ic:"🌿", name:"My-bag spirit (×5 no bag)"},
-  {id:"collector", ic:"📦", name:"20 items tried"},
-  {id:"gourmet", ic:"👑", name:"Tried everything"},
+  {id:"first", ic:"party", name:"ただいま — First visit"},
+  {id:"late", ic:"moon", name:"3AM run"},
+  {id:"onigiri_all", ic:"onigiri", name:"All onigiri tried"},
+  {id:"big", ic:"cash", name:"Big haul (¥2000+)"},
+  {id:"warm", ic:"onsen", name:"Had it heated"},
+  {id:"ic5", ic:"penguin", name:"5 IC taps"},
+  {id:"lowbal", ic:"star", name:"Cut it close (<¥200 left)"},
+  {id:"season", ic:"sakura", name:"Tried a seasonal item"},
+  {id:"mybag", ic:"leaf", name:"My-bag spirit (×5 no bag)"},
+  {id:"collector", ic:"box", name:"20 items tried"},
+  {id:"gourmet", ic:"crown", name:"Tried everything"},
 ];
 function unlock(id){ if(!G.achievements[id]){ G.achievements[id]=true; const a=ACHIEVEMENTS.find(x=>x.id===id);
-  if(a){ setTimeout(()=>{toast(`${a.ic} Stamp earned — ${a.name}`); Sound.stamp();}, 600);} } }
+  if(a){ setTimeout(()=>{toast(`Stamp earned — ${a.name}`, pxIcon(a.ic,14)); Sound.stamp();}, 600);} } }
 function checkAchievements(total){
   unlock("first");
   if(session.time==="late") unlock("late");
@@ -1893,7 +3372,7 @@ document.addEventListener("click", e=>{
   const s=e.target.closest(".js-sound");
   if(s){
     const on=!Sound.isEnabled(); Sound.setEnabled(on); Sound.resume();
-    $$(".js-sound").forEach(b=>b.textContent=on?"🔊":"🔇");
+    $$(".js-sound").forEach(b=>b.innerHTML=pxIcon(on?"soundOn":"soundOff",18));
     if(on){Sound.tick(); if(bgmAllowed) Sound.startAmbient(bgmKind);}
     return;
   }
@@ -1901,7 +3380,8 @@ document.addEventListener("click", e=>{
   if(p){ if(p.classList.contains("is-off")) return; Sound.resume();Sound.tick();showPassport(); }
 });
 
-/* Browsers block audio until the first user gesture — kick BGM in on the first tap/click/key anywhere, then remove the listener. */
+/* Browsers block audio until the first user gesture — kick BGM in on the
+   first tap/click/key anywhere, then remove the listener. */
 function firstGestureBGM(){
   Sound.resume();
   if(bgmAllowed) Sound.startAmbient(bgmKind);
@@ -1935,7 +3415,8 @@ for(const t of ["gesturestart","gesturechange","gestureend"]){
 document.addEventListener("touchstart", _blockPinch, {passive:false, capture:true});
 document.addEventListener("touchmove",  _blockPinch, {passive:false, capture:true});
 
-/* best-effort portrait lock (works in installed/Android contexts; harmless no-op in iOS Safari, where the CSS rotate-gate handles it instead) */
+/* best-effort portrait lock (works in installed/Android contexts; harmless no-op in iOS Safari,
+   where the CSS rotate-gate handles it instead) */
 try{ if(screen.orientation && screen.orientation.lock) screen.orientation.lock("portrait").catch(()=>{}); }catch(e){}
 
 /* one-time "Add to Home Screen" hint — iOS Safari only, hidden once installed/dismissed */
@@ -1969,6 +3450,10 @@ function maybeShowA2HS(){
 
 /* =========================================================== BOOT */
 newSession();
+// set initial pixel icons on the persistent float buttons
+$$(".js-sound").forEach(b=>b.innerHTML=pxIcon(Sound.isEnabled()?"soundOn":"soundOff",18));
+$$(".js-pass").forEach(b=>b.innerHTML=pxIcon("book",18));
+{ const ri=$("#rotIcon"); if(ri) ri.innerHTML=pxIcon("phone",40); }
 showSplash();
 </script>
 </body>
