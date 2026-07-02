@@ -744,6 +744,10 @@ body.rpg-active .joywrap{display:block;}
 .jchoose-card span{font-size:11.5px;color:var(--ink-soft);line-height:1.35;}
 .jchoose-emoji{font-size:38px;}
 .jchoose-time{margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 16px;font-size:12.5px;font-weight:700;color:var(--ink-soft);cursor:pointer;}
+.kbd-hint{margin-top:22px;padding:12px 16px;background:var(--px-navy2);border:2px solid var(--px-line);color:var(--px-dim);
+  font-size:9px;line-height:2.1;text-align:center;max-width:440px;}
+.kbd-hint .kbd{display:inline-block;background:var(--px-navy);border:1px solid var(--px-line);border-bottom-width:3px;
+  color:var(--px-light);padding:1px 6px;margin:0 2px;font-size:9px;}
 
 /* field prompt bubble ("press A") */
 .fieldprompt{position:fixed;left:50%;bottom:calc(122px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
@@ -2163,7 +2167,9 @@ const W = {
   player:{tx:0,ty:0,fx:0,fy:0,dir:"down",moving:false,moveT:0,fromX:0,fromY:0,toX:0,toY:0,frame:0},
 };
 let lastFrameTime = 0;
-const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints>0);
+const isTouch = window.matchMedia
+  ? window.matchMedia("(pointer: coarse)").matches           // primary input is a finger?
+  : (('ontouchstart' in window) || navigator.maxTouchPoints>0); // old-browser fallback
 
 function tileChar(map,x,y){
   if(y<0||y>=map.rows.length) return "#";
@@ -2483,6 +2489,12 @@ function showJourneyChoice(){
         </button>
       </div>
       <button class="jchoose-time" id="jTime">${pxIcon(TIME_ICON[session.time],14)} ${TIME_LABEL[session.time]} · ${SEASON_LABEL[session.season]} — change</button>
+      ${isTouch ? "" : `
+      <div class="kbd-hint">
+        <div class="kbd-row"><span class="kbd">W A S D</span><span class="kbd">↑↓←→</span> move</div>
+        <div class="kbd-row"><span class="kbd">E</span><span class="kbd">B</span><span class="kbd">Space</span><span class="kbd">Enter</span> interact · <span class="kbd">Esc</span> close / back</div>
+        <div class="kbd-row"><span class="kbd">1–9</span> add items · <span class="kbd">I</span> basket · <span class="kbd">P</span> passport · <span class="kbd">M</span> sound</div>
+      </div>`}
     </div>`);
   $("#jWalk").addEventListener("click",()=>{ Sound.tick(); enterExterior(); });
   $("#jTrain").addEventListener("click",()=>{ Sound.tick(); enterSubwayFromStreet(); });
@@ -2797,6 +2809,49 @@ document.addEventListener("keydown", e=>{
 });
 document.addEventListener("keyup", e=>{
   if(KEYMAP[e.key] && KEYMAP[e.key]===keyHeld){ keyHeld=null; W.heldDir=null; }
+});
+
+/* ---- desktop keyboard conveniences ---- */
+document.addEventListener("keydown", e=>{
+  const k=e.key;
+  // ESC (or X): close the topmost open panel, else step back a screen
+  if(k==="Escape"||k==="x"||k==="X"){
+    if(dialogBox.classList.contains("on")){ Sound.tick(); closeDialog(); e.preventDefault(); return; }
+    const modal=$("#modal");
+    if(modal && modal.classList.contains("on")){ Sound.tick(); closeModal(); e.preventDefault(); return; }
+    const drawer=$("#drawer");
+    if(drawer && drawer.classList.contains("on")){ Sound.tick(); closeDrawer(); e.preventDefault(); return; }
+    const pov=$("#passportOverlay");
+    if(pov && pov.classList.contains("on")){ Sound.tick(); closePassportOverlay(); e.preventDefault(); return; }
+    const back=$("#regBack")||$("#back");
+    if(back){ back.click(); e.preventDefault(); }
+    return;
+  }
+  // number keys press the nth ＋ button while a shelf / vending dialog is open
+  if(dialogBox.classList.contains("on") && /^[1-9]$/.test(k)){
+    const btns=dialogBox.querySelectorAll("[data-add],[data-vend]");
+    const b=btns[+k-1]; if(b){ b.click(); e.preventDefault(); }
+    return;
+  }
+  // i: toggle the basket while in the store
+  if(k==="i"||k==="I"){
+    const drawer=$("#drawer");
+    if(drawer && drawer.classList.contains("on")){ Sound.tick(); closeDrawer(); e.preventDefault(); return; }
+    if(W.active && W.map && W.map.id==="store"){ Sound.tick(); openDrawer(); e.preventDefault(); }
+    return;
+  }
+  // p: toggle the passport
+  if(k==="p"||k==="P"){
+    const pov=$("#passportOverlay");
+    if(pov && pov.classList.contains("on")){ Sound.tick(); closePassportOverlay(); }
+    else { Sound.resume(); Sound.tick(); showPassport(); }
+    e.preventDefault(); return;
+  }
+  // m: mute / unmute (via the button so all icons stay in sync)
+  if(k==="m"||k==="M"){
+    const sb=$$(".js-sound")[0]; if(sb){ sb.click(); e.preventDefault(); }
+    return;
+  }
 });
 
 function addToCart(id){
@@ -3504,6 +3559,7 @@ function maybeShowA2HS(){
 
 /* =========================================================== BOOT */
 newSession();
+
 // set initial pixel icons on the persistent float buttons
 $$(".js-sound").forEach(b=>b.innerHTML=pxIcon(Sound.isEnabled()?"soundOn":"soundOff",18));
 $$(".js-pass").forEach(b=>b.innerHTML=pxIcon("book",18));
