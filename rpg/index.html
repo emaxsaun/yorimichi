@@ -3298,6 +3298,9 @@ function passportHTML(justFinished){
       <button class="cta" id="again">${ctaLabel}</button>
     </div>
     <div style="text-align:center;margin-top:28px">
+      <button class="linkbtn" id="toTitle">⟲ Back to title screen</button>
+    </div>
+    <div style="text-align:center;margin-top:10px">
       <button class="linkbtn" id="resetProg">Reset everything (start fresh)</button>
     </div>
   </div>`;
@@ -3324,6 +3327,7 @@ function showPassport(justFinished){
   };
   q("#back").addEventListener("click",leave);
   q("#again").addEventListener("click",leave);
+  q("#toTitle").addEventListener("click",()=>{ Sound.tick(); location.reload(); });
   let resetArmed=false;
   q("#resetProg").addEventListener("click",()=>{
     const btn=q("#resetProg");
@@ -3396,7 +3400,13 @@ window.addEventListener("keydown", firstGestureBGM, true);
 /* iOS kills audio when the screen locks / app backgrounds — revive it on return */
 document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="visible") Sound.wake(); });
 window.addEventListener("focus", ()=>Sound.wake());
-window.addEventListener("pageshow", ()=>Sound.wake());
+window.addEventListener("pageshow", (e)=>{
+  // if the browser restored a frozen mid-game snapshot (back/forward cache),
+  // reload so the splash — and the version-switch link — are always fresh
+  // this will allow the user to switch versions easily
+  if(e.persisted){ location.reload(); return; }
+  Sound.wake();
+});
 
 /* Lock zoom. NOTE: recent iOS Safari intentionally limits a web page's ability to
    disable pinch-zoom (accessibility), so this may not fully hold on the newest iOS.
