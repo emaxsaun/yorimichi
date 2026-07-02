@@ -2555,17 +2555,17 @@ function openVending(){
   dialogBox.innerHTML = `
     <div class="dbox-panel">
       <div class="dbox-head"><span class="ic">${pxIcon("drink",22)}</span><h3 class="jp">自動販売機</h3>
-        <span class="sub">Vending machine · pay from balance</span>
+        <span class="sub">Vending machine · goes in your basket</span>
         <button class="dbox-close" id="dboxClose">${pxIcon("cross",14)}</button></div>
       <div class="dbox-body">
         ${stock.map(it=>`<div class="dbox-row">
           <div class="rart">${it.art()}</div>
           <div class="rtxt"><b>${it.ro}</b><div class="rtag">${it.en}</div></div>
           <div class="rprice">${yen(it.price)}</div>
-          <button class="radd" data-vend="${it.id}" aria-label="Buy ${it.ro}">＋</button>
+          <button class="radd" data-vend="${it.id}" aria-label="Grab ${it.ro}">＋</button>
         </div>`).join("")}
       </div>
-      <div class="dbox-foot">A cold one from the machine, straight away.</div>
+      <div class="dbox-foot">A cold one for the walk — pay at the register.</div>
     </div>`;
   dialogBox.classList.add("on");
   const cb=$("#dboxClose"); if(cb) cb.addEventListener("click",closeDialog);
@@ -2573,14 +2573,12 @@ function openVending(){
     if(e.target===dialogBox){ closeDialog(); return; }
     const b=e.target.closest("[data-vend]"); if(!b) return;
     const it=itemById(b.dataset.vend); if(!it) return;
-    if(session.balance < it.price){ showInsufficient(); return; }
-    session.balance -= it.price;
-    session.vendBought = (session.vendBought||0)+1;
+    session.cart[it.id]=(session.cart[it.id]||0)+1;
     Sound.coin();
-    refreshStoreHUD(); updateBalTop();
+    const cnt=$("#cnt"); if(cnt) cnt.textContent=cartCount();   // store HUD badge, if visible
     const foot=dialogBox.querySelector(".dbox-foot");
-    if(foot) foot.textContent = `${it.ro} — enjoy. Balance ${yen(session.balance)}.`;
-    toast(`${it.ro} — グビグビ`);
+    if(foot) foot.textContent = `${it.ro} — in your basket. (${cartCount()} item${cartCount()!==1?"s":""})`;
+    toast(`${it.ro} — in your basket`, pxIcon("drink",14));
   };
 }
 function updateBalTop(){ const bt=$("#balTop"); if(bt) bt.textContent=yen(session.balance); }
@@ -3469,8 +3467,7 @@ function checkAchievements(total){
 }
 
 /* =========================================================== GLOBAL CONTROLS */
-/* delegated so the same controls work whether they live in the float overlay
-   (most screens) or inside the store top bar */
+/* delegated so the same controls work whether they live in the float overlay (most screens) or inside the store top bar */
 document.addEventListener("click", e=>{
   const s=e.target.closest(".js-sound");
   if(s){
@@ -3483,8 +3480,7 @@ document.addEventListener("click", e=>{
   if(p){ if(p.classList.contains("is-off")) return; Sound.resume();Sound.tick();showPassport(); }
 });
 
-/* Browsers block audio until the first user gesture — kick BGM in on the
-   first tap/click/key anywhere, then remove the listener. */
+/* Browsers block audio until the first user gesture — kick BGM in on the first tap/click/key anywhere, then remove the listener. */
 function firstGestureBGM(){
   Sound.resume();
   if(bgmAllowed) Sound.startAmbient(bgmKind);
@@ -3524,8 +3520,7 @@ for(const t of ["gesturestart","gesturechange","gestureend"]){
 document.addEventListener("touchstart", _blockPinch, {passive:false, capture:true});
 document.addEventListener("touchmove",  _blockPinch, {passive:false, capture:true});
 
-/* best-effort portrait lock (works in installed/Android contexts; harmless no-op in iOS Safari,
-   where the CSS rotate-gate handles it instead) */
+/* best-effort portrait lock (works in installed/Android contexts; harmless no-op in iOS Safari, where the CSS rotate-gate handles it instead) */
 try{ if(screen.orientation && screen.orientation.lock) screen.orientation.lock("portrait").catch(()=>{}); }catch(e){}
 
 /* one-time "Add to Home Screen" hint — iOS Safari only, hidden once installed/dismissed */
