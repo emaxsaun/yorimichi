@@ -7,7 +7,8 @@
 
 Yorimichi (寄り道 — "a little detour on the way home") is a tiny, cozy *konbini* simulator. You're not running the store — you're just **visiting**. Pick a time of day and a season, walk or take the train over, wander the shelves, tap your card, and eat something good somewhere quiet. It's a small cure for the ache you feel after a trip to Japan ends.
 
-No goals, no timers, no pressure. Just the calm of a 24-hour convenience store at whatever hour you need it.
+No goals, no timers, no pressure.
+Just the calm of a 24-hour convenience store at whatever hour you need it.
 
 ---
 
@@ -54,7 +55,8 @@ You can also drag the joystick to walk, or just tap where you want to go and you
 
 ## Get the full-screen experience (iOS)
 
-In Safari, tap the **Share** button → **Add to Home Screen**. Launched from the home screen it runs full-screen with no browser chrome — the closest thing to a real little app. (The site nudges you toward this the first time, too.)
+In Safari, tap the **Share** button → **Add to Home Screen**.
+Launched from the home screen it runs full-screen with no browser chrome — the closest thing to a real little app. (The site nudges you toward this the first time, too.)
 
 ---
 
