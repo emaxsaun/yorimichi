@@ -2144,11 +2144,11 @@ const SUBWAY_ROWS = [
   "#.........#",
   "#.........#",
   "#.........#",
-  "L.........#",
   "#.........#",
   "#.........#",
   "#.........#",
-  "###########",
+  "#.........#",
+  "#####L#####",
 ];
 const SUBWAY_LEGEND = {
   "#":{solid:true, draw:drawSubwayWall},
@@ -2157,7 +2157,7 @@ const SUBWAY_LEGEND = {
   "T":{solid:true, draw:drawTrainDoor, interact:()=>boardTrain(), label:"board the train"},
   "L":{solid:false, draw:drawStairsUp, auto:()=>leaveSubwayToStreet()},
 };
-const SUBWAY_MAP = {id:"subway", rows:SUBWAY_ROWS, legend:SUBWAY_LEGEND, viewW:9, viewH:9, spawn:{x:5,y:8,dir:"up"}};
+const SUBWAY_MAP = {id:"subway", rows:SUBWAY_ROWS, legend:SUBWAY_LEGEND, viewW:9, viewH:9, spawn:{x:5,y:9,dir:"up"}};
 
 /* ---------------------------------------------------------- engine state */
 const DIRV = {up:[0,-1], down:[0,1], left:[-1,0], right:[1,0]};
@@ -2532,7 +2532,7 @@ function enterSubwayFromStreet(){
   bgmAllowed=true; bgmKind="title";
   setTod();
   whud.innerHTML="";
-  enterScene(SUBWAY_MAP, {x:5,y:8,dir:"up"});
+  enterScene(SUBWAY_MAP, {x:5,y:9,dir:"up"});
   toast("Take the train to the store, or head back up.");
 }
 function leaveSubwayToStreet(){ enterExterior({x:8,y:11,dir:"down"}); }
@@ -3489,8 +3489,7 @@ document.addEventListener("click", e=>{
   if(p){ if(p.classList.contains("is-off")) return; Sound.resume();Sound.tick();showPassport(); }
 });
 
-/* Browsers block audio until the first user gesture — kick BGM in on the
-   first tap/click/key anywhere, then remove the listener. */
+/* Browsers block audio until the first user gesture — kick BGM in on the first tap/click/key anywhere, then remove the listener. */
 function firstGestureBGM(){
   Sound.resume();
   if(bgmAllowed) Sound.startAmbient(bgmKind);
