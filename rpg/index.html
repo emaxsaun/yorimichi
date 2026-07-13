@@ -3328,7 +3328,13 @@ function showEnjoy(){
       <h2 class="jp">${it.jp}</h2>
       <div class="ro">${it.ro} · ${it.en}</div>
       <p class="flavor">You sit ${where}, ${carry}, and open the ${it.ro}.</p>
-      ${session.bagged?`<div class="bagnote"><div class="bagicon">${Art.bag()}</div><span>everything else waits in the ヨリミチ bag</span></div>`:""}
+      ${session.bagged ? (()=>{
+        const remaining = enjoyItems.length - enjoyIndex - 1;
+        if(enjoyItems.length === 1) return "";                     // only item — bag note makes no sense
+        if(remaining === 0) return `<div class="bagnote"><div class="bagicon">${Art.bag()}</div><span>the ヨリミチ bag is empty</span></div>`;
+        const word = remaining === 1 ? "one more thing waits" : `${remaining} more things wait`;
+        return `<div class="bagnote"><div class="bagicon">${Art.bag()}</div><span>${word} in the ヨリミチ bag</span></div>`;
+      })() : ""}
       <p class="flavor" style="font-style:normal;margin-top:8px">${it.flavor}</p>
       <div class="enjoynav">
         ${enjoyItems.length>1 && enjoyIndex>0?`<button class="cta ghost small" id="prev">‹</button>`:""}
@@ -3529,8 +3535,7 @@ for(const t of ["gesturestart","gesturechange","gestureend"]){
 document.addEventListener("touchstart", _blockPinch, {passive:false, capture:true});
 document.addEventListener("touchmove",  _blockPinch, {passive:false, capture:true});
 
-/* best-effort portrait lock (works in installed/Android contexts; harmless no-op in iOS Safari,
-   where the CSS rotate-gate handles it instead) */
+/* best-effort portrait lock (works in installed/Android contexts; harmless no-op in iOS Safari, where the CSS rotate-gate handles it instead) */
 try{ if(screen.orientation && screen.orientation.lock) screen.orientation.lock("portrait").catch(()=>{}); }catch(e){}
 
 /* one-time "Add to Home Screen" hint — iOS Safari only, hidden once installed/dismissed */
