@@ -338,7 +338,7 @@ body.in-store .float{display:none;}   /* in the store the sound/passport live in
   animation:print .6s ease both;transform-origin:top;}
 @keyframes print{from{transform:scaleY(0);opacity:.4;}to{transform:scaleY(1);opacity:1;}}
 .receipt .rhead{text-align:center;font-family:"Zen Maru Gothic";font-weight:900;font-size:18px;letter-spacing:.2em;color:var(--brand-deep);}
-.receipt .rsub{text-align:center;font-size:10.5px;color:#6b6b62;margin-bottom:10px;}
+.receipt .rsub{text-align:center;font-size:10.5px;color:#6b6b62;margin-bottom:45px;}
 .receipt .rule{border-top:1.5px dashed #b9b9ad;margin:8px 0;}
 .receipt .rrow{display:flex;justify-content:space-between;gap:8px;padding:2px 0;}
 .receipt .rrow .nm{flex:1;}
@@ -638,7 +638,7 @@ body{ image-rendering:pixelated; }
 .brandmark{ background:transparent !important; }
 
 /* make small body text a touch bigger since DotGothic16 runs small */
-.dbox-row .rtag,.dbox-head .sub,.dbox-foot,.jchoose-card span{ font-size:10px !important; line-height:1.5 !important; white-space: nowrap;}
+.dbox-row .rtag,.dbox-head .sub,.dbox-foot,.jchoose-card span{ font-size:10px !important; line-height:1.5 !important;}
 
 /* ---- CATCH-ALL: any white/rounded card-like surface anywhere in a screen ---- */
 .screen div, .screen section, .screen article{ box-shadow:none !important; }
@@ -780,7 +780,7 @@ body.rpg-active .joywrap{display:block;}
 .dbox-row .rart svg{width:100%;height:100%;}
 .dbox-row .rtxt{flex:1;min-width:0;}
 .dbox-row .rtxt b{display:block;font-size:14px;}
-.dbox-row .rtxt .rtag{font-size:11.5px;color:var(--ink-soft);}
+.dbox-row .rtxt .rtag{font-size:11.5px;color:var(--ink-soft); white-space: nowrap;}
 .dbox-row .rprice{font-weight:800;font-size:13.5px;flex:none;}
 .dbox-row .radd{flex:none;width:34px;height:34px;border-radius:50%;background:var(--brand);color:#fff;
   font-size:18px;font-weight:800;box-shadow:0 6px 12px -6px var(--brand-deep);}
