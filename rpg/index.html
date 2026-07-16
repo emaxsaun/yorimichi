@@ -47,7 +47,7 @@
 html,body{margin:0;padding:0;touch-action:pan-x pan-y;height:100%;width:100%;}
 body{
   font-family:"M PLUS Rounded 1c",system-ui,sans-serif;
-  color:var(--ink);
+  color:#eeeeee;
   background:#dfe6e4;
   -webkit-font-smoothing:antialiased;
   position:fixed;inset:0;overflow:hidden;overscroll-behavior:none;
@@ -260,9 +260,9 @@ body.in-store .float{display:none;}   /* in the store the sound/passport live in
 .stepper b{min-width:18px;text-align:center;font-size:14px;}
 .empty{padding:40px 20px;text-align:center;color:var(--ink-soft);}
 .empty svg{height:90px;opacity:.7;margin-bottom:10px;}
-.drawer footer{padding:14px 16px 18px;border-top:1px solid var(--line);background:#fff;}
-.totrow{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-soft);margin-bottom:4px;}
-.totrow.grand{font-size:20px;font-weight:800;color:var(--ink);margin:8px 0 12px;}
+.drawer footer{padding:14px 16px 18px;border-top:1px solid var(--line);background:var(--px-navy);}
+.totrow{display:flex;justify-content:space-between;font-size:13px;color:var(--px-dim);margin-bottom:4px;}
+.totrow.grand{font-size:20px;font-weight:800;color:var(--px-red);margin:8px 0 12px;}
 .totrow.grand .mono{font-size:22px;}
 
 /* ============================================================ REGISTER */
@@ -282,7 +282,7 @@ body.in-store .float{display:none;}   /* in the store the sound/passport live in
 .scanrow .sp{font-family:"Roboto Mono";font-size:13px;}
 .askbox{background:#fff;border-radius:18px;box-shadow:var(--shadow);padding:18px;max-width:440px;margin:0 auto;width:100%;}
 .askbox h3{font-size:17px;margin-bottom:4px;}
-.askbox p{margin:0 0 14px;color:var(--ink-soft);font-size:13px;}
+.askbox p{margin:0 0 14px;color:var(--px-dim);font-size:13px;}
 .askrow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
 
 /* payment methods */
@@ -291,7 +291,7 @@ body.in-store .float{display:none;}   /* in the store the sound/passport live in
   font-weight:800;font-size:14px;transition:all var(--fast);display:flex;flex-direction:column;gap:6px;align-items:center;}
 .paymethod:hover{border-color:var(--brand);transform:translateY(-2px);}
 .paymethod .pm-ic{font-size:26px;}
-.paymethod small{font-weight:600;font-size:11px;color:var(--ink-soft);}
+.paymethod small{font-weight:600;font-size:11px;color:var(--px-dim);}
 
 /* IC tap moment — the signature interaction */
 .tapstage{max-width:440px;margin:0 auto;width:100%;text-align:center;}
@@ -314,7 +314,7 @@ body.in-store .float{display:none;}   /* in the store the sound/passport live in
 .iccard .penguin{position:absolute;right:8px;bottom:6px;font-size:30px;}
 .iccard b{font-family:"Zen Maru Gothic";font-size:13px;letter-spacing:.1em;}
 .iccard .bal{font-family:"Roboto Mono";font-size:16px;font-weight:700;margin-top:18px;}
-.tap-hint{font-size:13px;color:var(--ink-soft);margin-top:6px;}
+.tap-hint{font-size:13px;color:var(--panel);margin-top:6px;}
 .lowbal{color:#c0392b;font-weight:700;font-size:13px;}
 
 /* cash */
@@ -556,6 +556,11 @@ body{ image-rendering:pixelated; }
 .dbox-row .rtag{ color:var(--px-dim) !important; }
 .dbox-row .rprice{ color:var(--px-yellow) !important; }
 .dbox-row .radd{ background:var(--px-green) !important; color:#062a1e !important; border:2px solid var(--px-edge) !important; box-shadow:inset -2px -2px 0 0 var(--px-green-d) !important;}
+.dbox-row .rsub{ background:var(--px-navy2) !important; color:var(--px-red) !important; border:2px solid var(--px-line) !important; box-shadow:none !important; }
+.rqty-ctrl{ display:flex; align-items:center; gap:4px; flex:none; }
+.rqty{ color:var(--px-yellow) !important; font-size:11px; font-weight:700; min-width:14px; text-align:center; }
+.rsub,.radd{ width:34px; height:34px; font-size:18px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex:none; }
+.rsub.hidden,.rqty.hidden{ display:none; }
 .dbox-empty,.dbox-foot{ color:var(--px-dim) !important; }
 .dbox-row .rart{ image-rendering:pixelated; }
 
@@ -692,7 +697,7 @@ body{ image-rendering:pixelated; }
 #app{position:absolute;inset:0;z-index:10;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
   overscroll-behavior:contain;display:flex;flex-direction:column;pointer-events:none;}
 #app:empty{background:none;}
-#app:not(:empty){pointer-events:auto;background:var(--floor);}
+#app:not(:empty){pointer-events:auto;background:var(--px-navy);}
 
 /* store HUD — sits above the canvas only while inside the store */
 .whud{position:absolute;top:0;left:0;right:0;z-index:3;display:none;align-items:center;gap:6px;
@@ -972,7 +977,7 @@ function svg(inner,vb){ return `<svg viewBox="${vb||'0 0 100 100'}" xmlns="http:
    Each icon is an 8x8 grid of palette chars -> inline SVG rects. Crisp at any size. */
 const PXI_PAL = {
   ' ':null,'.':'#00000000',
-  k:'#20241c', w:'#ffffff', y:'#f5c542', o:'#e8862a', r:'#e05a5a', g:'#2fbf87',
+  k:'#333333', w:'#ffffff', y:'#f5c542', o:'#e8862a', r:'#e05a5a', g:'#2fbf87',
   G:'#0d6a4a', b:'#5bb7e0', B:'#2f6fb0', p:'#e58fb0', P:'#c0466a', s:'#ffe0c2',
   n:'#20304a', l:'#e0f4fa', d:'#8a6f4c', m:'#96a0a4', c:'#c0392b', t:'#78c878',
   W:'#e8ecf5', x:'#3a4670',
@@ -2377,22 +2382,40 @@ function hideFieldPrompt(){ fieldPrompt.classList.remove("on"); }
 
 /* ---------------------------------------------------------- shelf / clerk / register dialogs */
 function dboxRow(it){
-  return `<div class="dbox-row">
+  const qty = session.cart[it.id]||0;
+  return `<div class="dbox-row" id="drow_${it.id}">
     <div class="rart">${it.art()}</div>
     <div class="rtxt"><b>${it.ro}</b><div class="rtag">${it.tag}</div></div>
     <div class="rprice">${yen(it.price)}</div>
-    <button class="radd" data-add="${it.id}" aria-label="Add ${it.ro}">＋</button>
+    <div class="rqty-ctrl">
+      <button class="rsub${qty>0?"":" hidden"}" data-sub="${it.id}" aria-label="Remove ${it.ro}">－</button>
+      <span class="rqty${qty>0?"":" hidden"}" id="rqty_${it.id}">${qty||""}</span>
+      <button class="radd" data-add="${it.id}" aria-label="Add ${it.ro}">＋</button>
+    </div>
   </div>`;
 }
 function wireDialogClicks(){
   const closeBtn = $("#dboxClose"); if(closeBtn) closeBtn.addEventListener("click",closeDialog);
   dialogBox.onclick = (e)=>{
     if(e.target===dialogBox){ closeDialog(); return; }
-    const b=e.target.closest("[data-add]"); if(!b) return;
-    addToCart(b.dataset.add);
+    const add=e.target.closest("[data-add]");
+    const sub=e.target.closest("[data-sub]");
+    if(!add && !sub) return;
+    if(add){ addToCart(add.dataset.add); updateDboxQty(add.dataset.add); }
+    if(sub){
+      const id=sub.dataset.sub;
+      if((session.cart[id]||0)>0){ session.cart[id]--; if(!session.cart[id]) delete session.cart[id]; syncStoreCounts(); Sound.tick(); }
+      updateDboxQty(id);
+    }
     const foot=dialogBox.querySelector(".dbox-foot");
     if(foot) foot.textContent = cartCount()?`You have ${cartCount()} in your basket.`:"Tap ＋ to add something.";
   };
+}
+function updateDboxQty(id){
+  const qty=session.cart[id]||0;
+  const qtyEl=$("#rqty_"+id); const subEl=dialogBox.querySelector(`[data-sub="${id}"]`);
+  if(qtyEl){ qtyEl.textContent=qty||""; qtyEl.classList.toggle("hidden",qty===0); }
+  if(subEl){ subEl.classList.toggle("hidden",qty===0); }
 }
 function openShelfDialog(secId, icon){
   Sound.tick();
@@ -2549,6 +2572,8 @@ let trainRiding = false;
 function backToStore(){
   bgmAllowed=true; bgmKind="store";
   Sound.startAmbient("store");
+  // Fix floating buttons bug
+  document.body.classList.add("in-store");
   resumeFieldEngine();
 }
 

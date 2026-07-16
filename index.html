@@ -170,7 +170,7 @@ body.in-store .float{display:none;}   /* in the store the sound/passport live in
 .pathcard p{margin:0;font-size:13px;color:var(--ink-soft);line-height:1.45;}
 
 /* vending machine mini-buy */
-.vend{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:6px;}
+.vend{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:6px;width:420px;}
 
 /* ============================================================ STORE */
 .topbar{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.98);backdrop-filter:blur(8px);
@@ -220,6 +220,14 @@ body.in-store .float{display:none;}   /* in the store the sound/passport live in
 .product .nm .ro{display:block;font-size:11px;color:var(--ink-soft);font-weight:600;}
 .product .dsc{font-size:11.5px;color:var(--ink-soft);line-height:1.35;min-height:1px;}
 .product .foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;}
+.product .price { white-space: nowrap; font-size: 13px; }
+.card-ctrl{display:flex;align-items:center;gap:5px;flex:none;}
+.card-sub{display:inline-flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;
+  width:34px;height:34px;border-radius:10px;border:1.5px solid var(--line);
+  background:#f0eeea;color:var(--ink-soft);cursor:pointer;
+  -webkit-tap-highlight-color:transparent;}
+.card-sub:active{background:#e4e2de;}
+.card-sub.hidden{display:none;}
 .price{font-family:"Roboto Mono";font-weight:700;font-size:15px;}
 .price small{font-size:10px;font-weight:500;color:var(--ink-soft);}
 .add{background:var(--brand);color:#fff;border-radius:10px;width:34px;height:34px;font-size:20px;font-weight:700;
@@ -1266,6 +1274,8 @@ function showStore(sec){
   if(ab) ab.scrollLeft = aisleScrollLeft || 0;
 }
 function storeAddHandler(e){
+  const sub=e.target.closest("[data-sub]");
+  if(sub){ e.stopPropagation(); e.preventDefault(); removeFromCart(sub.dataset.sub); return; }
   const a=e.target.closest("[data-add]"); if(!a)return;
   addToCart(a.dataset.add);
 }
@@ -1280,18 +1290,38 @@ function productCard(it){
     <div class="art">${it.art()}</div>
     <div class="nm">${it.jp}<span class="ro">${it.ro}</span></div>
     <div class="dsc">${it.tag}</div>
-    <div class="foot"><span class="price">${yen(it.price)}<small> 税込</small></span><span class="add">＋</span></div>
+    <div class="foot">
+      <span class="price">${yen(it.price)}<small> 税込</small></span>
+      <span class="card-ctrl">
+        <span class="card-sub${q>0?"":" hidden"}" data-sub="${it.id}">－</span>
+        <span class="add">＋</span>
+      </span>
+    </div>
   </button>`;
 }
 function addToCart(id){
   const it=itemById(id); if(!it)return;
   session.cart[id]=(session.cart[id]||0)+1;
   Sound.pop();
-  // update counts in place
-  const card=document.querySelector(`.product[data-add="${id}"]`);
-  if(card){ let dot=card.querySelector(".qtydot"); if(!dot){dot=document.createElement("span");dot.className="qtydot";card.appendChild(dot);} dot.textContent=session.cart[id]; }
+  updateProductCard(id);
   syncStoreCounts();
   toast(`${it.ro} ×${session.cart[id]}`);
+}
+function removeFromCart(id){
+  if(!(session.cart[id]>0)) return;
+  session.cart[id]--;
+  if(!session.cart[id]) delete session.cart[id];
+  Sound.tick();
+  updateProductCard(id);
+  syncStoreCounts();
+}
+function updateProductCard(id){
+  const card=document.querySelector(`.product[data-add="${id}"]`); if(!card) return;
+  const q=session.cart[id]||0;
+  let dot=card.querySelector(".qtydot");
+  if(q>0){ if(!dot){dot=document.createElement("span");dot.className="qtydot";card.insertBefore(dot,card.firstChild);} dot.textContent=q; }
+  else if(dot){ dot.remove(); }
+  const sub=card.querySelector(".card-sub"); if(sub) sub.classList.toggle("hidden",q===0);
 }
 
 /* =========================================================== BASKET DRAWER */
@@ -1332,12 +1362,13 @@ function closeDrawer(){ $("#drawer").classList.remove("on"); $("#scrim").classLi
 function syncStoreCounts(){
   const c=$("#cnt"); if(c)c.textContent=cartCount();
   const st=$("#storeStatus"); if(st) st.textContent = `Tap a shelf item to add it. ${cartCount()?`You have ${cartCount()} in your basket.`:"Take your time."}`;
-  // keep product qty dots in sync (e.g. after removing in the drawer)
+  // keep product qty dots + inline minus/qty in sync (e.g. after removing in the drawer)
   document.querySelectorAll(".product[data-add]").forEach(card=>{
     const id=card.getAttribute("data-add"); const q=session.cart[id]||0;
     let dot=card.querySelector(".qtydot");
-    if(q>0){ if(!dot){dot=document.createElement("span");dot.className="qtydot";card.appendChild(dot);} dot.textContent=q; }
+    if(q>0){ if(!dot){dot=document.createElement("span");dot.className="qtydot";card.insertBefore(dot,card.firstChild);} dot.textContent=q; }
     else if(dot){ dot.remove(); }
+    const sub=card.querySelector(".card-sub"); if(sub) sub.classList.toggle("hidden",q===0);
   });
 }
 
@@ -1949,8 +1980,7 @@ for(const t of ["gesturestart","gesturechange","gestureend"]){
 document.addEventListener("touchstart", _blockPinch, {passive:false, capture:true});
 document.addEventListener("touchmove",  _blockPinch, {passive:false, capture:true});
 
-/* best-effort portrait lock (works in installed/Android contexts; harmless no-op in iOS Safari,
-   where the CSS rotate-gate handles it instead) */
+/* best-effort portrait lock (works in installed/Android contexts; harmless no-op in iOS Safari, where the CSS rotate-gate handles it instead) */
 try{ if(screen.orientation && screen.orientation.lock) screen.orientation.lock("portrait").catch(()=>{}); }catch(e){}
 
 /* one-time "Add to Home Screen" hint — iOS Safari only, hidden once installed/dismissed */
