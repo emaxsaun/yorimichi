@@ -607,6 +607,8 @@ body{ image-rendering:pixelated; }
 }
 .passport h2,.passport h3{ color:var(--px-light) !important; }
 .stamp-earned,.stat{ background:var(--px-navy2) !important; border:2px solid var(--px-line) !important; color:var(--px-light) !important; }
+.stat b{ color:var(--px-green) !important; }
+.stat span{ color:var(--px-dim) !important; }
 
 /* ---- journey choice ---- */
 .jchoose-title{ color:var(--px-green) !important; font-size:22px !important; }
@@ -666,8 +668,11 @@ body{ image-rendering:pixelated; }
 .lowbal{ color:var(--px-red) !important; }
 .paygrid .paymethod,.paymethod{ background:var(--px-navy2) !important; border:2px solid var(--px-line) !important; color:var(--px-light) !important; }
 .passgrid .stamp,.passgrid .ach,.stamp-earned{ background:var(--px-navy2) !important; border:2px solid var(--px-line) !important; border-radius:0 !important; box-shadow:none !important; }
+.passgrid .stamp{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 4px;}
+.passgrid .stamp > svg{height:40px;flex:none;}
+.passgrid .stamp .sname svg{width:12px;height:12px;}
 .passgrid .stamp.locked,.ach.locked{ filter:none !important; opacity:.4 !important; }
-.passgrid .stamp .sname{ color:var(--px-light) !important; }
+.passgrid .stamp .sname{ color:var(--px-light) !important; font-size:9px;line-height:1.1; }
 .passgrid .stamp .cnt{ background:var(--px-green) !important; color:#062a1e !important; border-radius:0 !important; }
 .modal .modalcard,.modalrow{ background:var(--px-navy2) !important; }
 .chooser button,.modalrow button{ background:var(--px-navy) !important; color:var(--px-light) !important; border:2px solid var(--px-line) !important; }
