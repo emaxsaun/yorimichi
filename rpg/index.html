@@ -344,8 +344,8 @@ body.in-store .float{display:none;}   /* in the store the sound/passport live in
 .receipt .rrow .nm{flex:1;}
 .receipt .rrow.tot{font-weight:700;font-size:14px;}
 .receipt .rmeta{font-size:10.5px;color:#6b6b62;line-height:1.7;margin-top:8px;}
-.receipt .stamp{position:absolute;right:14px;bottom:14px;border:2px solid #c0392b;color:#c0392b;border-radius:8px;
-  padding:3px 8px;font-family:"Zen Maru Gothic";font-weight:900;transform:rotate(-9deg);opacity:.8;font-size:12px;}
+.receipt .stamp{position:absolute;right:14px;bottom:14px;border:2px solid #c0392b;color:#c0392b !important;border-radius:8px;
+  padding:3px 8px;font-family:"Zen Maru Gothic";font-weight:900;transform:rotate(-9deg);opacity:.8;font-size:12px;border-color: #c0392b !important;box-shadow: 0 0 0 2px #f3f1e6, 0 0 0 5px #c0392b !important;}
 .points{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:10px 16px;font-size:13px;font-weight:700;
   display:flex;gap:8px;align-items:center;}
 
@@ -478,7 +478,7 @@ body.in-store .float{display:none;}   /* in the store the sound/passport live in
   --px-green:#2fbf87;
   --px-green-d:#0d6a4a;
   --px-yellow:#f5c542;
-  --px-red:#e05a5a;
+  --px-red:#f07070;
   --px-line:#3a4670;      /* inner divider */
 }
 :focus-visible{outline:3px solid var(--px-green);outline-offset:2px;}
@@ -750,9 +750,9 @@ body.rpg-active .joywrap{display:block;}
 .jchoose-emoji{font-size:38px;}
 .jchoose-time{margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 16px;font-size:12.5px;font-weight:700;color:var(--ink-soft);cursor:pointer;}
 .kbd-hint{margin-top:22px;padding:12px 16px;background:var(--px-navy2);border:2px solid var(--px-line);color:var(--px-dim);
-  font-size:9px;line-height:2.1;text-align:center;max-width:440px;}
+  font-size:11px;line-height:2.1;text-align:center;max-width:440px;}
 .kbd-hint .kbd{display:inline-block;background:var(--px-navy);border:1px solid var(--px-line);border-bottom-width:3px;
-  color:var(--px-light);padding:1px 6px;margin:0 2px;font-size:9px;}
+  color:var(--px-light);padding:1px 6px;margin:0 2px;font-size:11px;}
 
 /* field prompt bubble ("press A") */
 .fieldprompt{position:fixed;left:50%;bottom:calc(172px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
@@ -786,6 +786,14 @@ body.rpg-active .joywrap{display:block;}
   font-size:18px;font-weight:800;box-shadow:0 6px 12px -6px var(--brand-deep);}
 .dbox-empty{padding:24px 8px;text-align:center;color:var(--ink-soft);font-size:13px;}
 .dbox-foot{padding:10px 18px 2px;text-align:center;font-size:11.5px;color:var(--ink-soft);}
+
+.rcol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex: none;
+}
 
 @media (max-width:413px){
   .whud .logo{font-size:13.5px;}
@@ -2386,11 +2394,13 @@ function dboxRow(it){
   return `<div class="dbox-row" id="drow_${it.id}">
     <div class="rart">${it.art()}</div>
     <div class="rtxt"><b>${it.ro}</b><div class="rtag">${it.tag}</div></div>
-    <div class="rprice">${yen(it.price)}</div>
-    <div class="rqty-ctrl">
-      <button class="rsub${qty>0?"":" hidden"}" data-sub="${it.id}" aria-label="Remove ${it.ro}">－</button>
-      <span class="rqty${qty>0?"":" hidden"}" id="rqty_${it.id}">${qty||""}</span>
-      <button class="radd" data-add="${it.id}" aria-label="Add ${it.ro}">＋</button>
+    <div class="rcol">
+      <div class="rprice">${yen(it.price)}</div>
+      <div class="rqty-ctrl">
+        <button class="rsub${qty>0?"":" hidden"}" data-sub="${it.id}" aria-label="Remove ${it.ro}">－</button>
+        <span class="rqty${qty>0?"":" hidden"}" id="rqty_${it.id}">${qty||""}</span>
+        <button class="radd" data-add="${it.id}" aria-label="Add ${it.ro}">＋</button>
+      </div>
     </div>
   </div>`;
 }
