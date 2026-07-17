@@ -363,6 +363,8 @@ body.in-store .float{display:none;}   /* in the store the sound/passport live in
 .enjoyscene svg{display:block;width:100%;}
 .enjoycard{background:#fff;border-radius:20px;box-shadow:var(--shadow);padding:18px;max-width:440px;margin:-30px 16px 0;
   width:calc(100% - 32px);text-align:center;position:relative;z-index:2;}
+.enjoycard.multi-item{min-height:520px;display:flex;flex-direction:column;}
+.enjoycard.multi-item .enjoynav{margin-top:auto;}
 .enjoycard .bigart{height:120px;margin:2px auto 8px;display:grid;place-items:center;}
 .enjoycard .bigart svg{height:120px;filter:drop-shadow(0 10px 10px rgba(31,36,33,.18));}
 .enjoycard h2{font-size:20px;}
@@ -1771,7 +1773,7 @@ function showEnjoy(){
   render(`
   <div class="enjoy">
     ${enjoySpotSVG(session.time)}
-    <div class="enjoycard">
+    <div class="enjoycard${enjoyItems.length>1?' multi-item':''}">
       <div class="bigart">${it.art()}</div>
       <h2 class="jp">${it.jp}</h2>
       <div class="ro">${it.ro} · ${it.en}</div>
@@ -1945,8 +1947,7 @@ document.addEventListener("click", e=>{
   if(p){ if(p.classList.contains("is-off")) return; Sound.resume();Sound.tick();showPassport(); }
 });
 
-/* Browsers block audio until the first user gesture — kick BGM in on the first tap/click/key anywhere,
-   then remove the listener. */
+/* Browsers block audio until the first user gesture — kick BGM in on the first tap/click/key anywhere, then remove the listener. */
 function firstGestureBGM(){
   Sound.resume();
   if(bgmAllowed) Sound.startAmbient(bgmKind);
@@ -1984,8 +1985,7 @@ for(const t of ["gesturestart","gesturechange","gestureend"]){
 document.addEventListener("touchstart", _blockPinch, {passive:false, capture:true});
 document.addEventListener("touchmove",  _blockPinch, {passive:false, capture:true});
 
-/* best-effort portrait lock (works in installed/Android contexts; harmless no-op in iOS Safari,
-   where the CSS rotate-gate handles it instead) */
+/* best-effort portrait lock (works in installed/Android contexts; harmless no-op in iOS Safari, where the CSS rotate-gate handles it instead) */
 try{ if(screen.orientation && screen.orientation.lock) screen.orientation.lock("portrait").catch(()=>{}); }catch(e){}
 
 /* one-time "Add to Home Screen" hint — iOS Safari only, hidden once installed/dismissed */
